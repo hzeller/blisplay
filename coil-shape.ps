@@ -1,0 +1,78 @@
+%!PS
+%%BoundingBox: 0 0 80 80
+
+/mm { 25.4 div 72 mul } def
+/in { 72 mul } def
+
+% Some variables as used in scad
+/mag_len 1.5 in def
+/mag_w 0.25 in def
+/yoke_thick mag_w def
+/yoke_space 4 mm def
+
+/bottom-corner-radius 1 mm def
+
+/coil-height mag_w 3 mul def
+/coil-length mag_len 2 div def
+
+/poke-length 3 mm def
+/poke-dia 0.8 mm def
+/poke-dist 2 mm def
+
+/poke-r poke-dia 2 div def
+/poke-space-r poke-dist poke-dia sub 2 div def
+
+/poke-top-turn coil-height poke-length add def
+/poke-bot-turn coil-height poke-space-r add def
+
+% We offset the coil a little away from the center.
+/center-offset poke-dist poke-dia sub 2 div def
+
+/fulcrum-dist mag_len yoke_thick add 2 div yoke_space add center-offset sub def
+/fulcrum-r 2 mm 2 div def
+/fulcrum-wall 1.2 mm def
+
+% the way the fulcrum is displayed. For drilling or PCB design, we might only
+% want to have a tiny one.
+%/fulcrum-r-show fulcrum-r def
+/fulcrum-r-show 0.05 mm def
+
+0.1 mm setlinewidth
+
+fulcrum-dist fulcrum-r-show add coil-height 2 div moveto
+fulcrum-dist coil-height 2 div fulcrum-r-show 0 360 arc
+stroke
+
+0 bottom-corner-radius moveto 0 coil-height lineto
+0 poke-length rlineto stroke
+
+% poke fingers. A little bit copy-paste here :)
+/x-pos poke-dist 0 mul def
+x-pos poke-r add poke-top-turn poke-r 180 0 arcn
+x-pos poke-dia poke-space-r add add poke-bot-turn poke-space-r 180 0 arc
+
+/x-pos poke-dist 1 mul def
+x-pos poke-r add poke-top-turn poke-r 180 0 arcn
+x-pos poke-dia poke-space-r add add poke-bot-turn poke-space-r 180 0 arc
+
+/x-pos poke-dist 2 mul def
+x-pos poke-r add poke-top-turn poke-r 180 0 arcn
+x-pos poke-dia poke-space-r add add poke-bot-turn poke-space-r 180 270 arc
+
+coil-length coil-height lineto  % top right
+
+coil-length 2 mm add coil-height
+fulcrum-dist coil-length 2.5 div sub coil-height 2 div fulcrum-r fulcrum-wall add add
+fulcrum-dist coil-height 2 div fulcrum-r fulcrum-wall add add
+curveto
+
+fulcrum-dist coil-height 2 div fulcrum-r fulcrum-wall add 90 270 arcn
+
+fulcrum-dist coil-length 2.5 div sub coil-height 2 div fulcrum-r fulcrum-wall add sub
+coil-length 2 mm add 0
+coil-length 0 curveto
+
+bottom-corner-radius dup dup 270 180 arcn
+
+stroke
+showpage

@@ -60,16 +60,21 @@ module yoke(with_magnet=true) {
 }
 
 module coil(poke_pos=0) {
-     poke_width=dot_dia/2;
-     translate([-coil_thick/2, (dot_dist-poke_width)/2, 0]) {
-	  color("yellow") cube([coil_thick, mag_len/2-coil_short, coil_height]);
-	  color("pink") translate([0, poke_pos*dot_dist, coil_height]) cube([coil_thick, dot_dia/2, poke_len]);
+     poke_width=0.8;
+     difference() {
+	  color("yellow")
+	       translate([0, (dot_dist-poke_width)/2, 0]) rotate([90, 0, 90])
+	       linear_extrude(height=coil_thick, center=true, convexity = 10)
+	       import (file = "coil-shape.dxf");
+	  // Remove the fingers that we're not interested in.
+	  for (i = [0:3]) {
+	       if (i != poke_pos) {
+		    translate([-1, (dot_dist-poke_width)/2 + i*dot_dist-0.5, coil_height])
+			 cube([2, dot_dist+0.5, 5]);
+	       }
+	  }
      }
-     color("yellow") hull() {
-	  translate([-coil_thick/2, fulcrum_distance, coil_height/2]) rotate([0, 90, 0]) cylinder(r=fulcrum_dia/2 + fulcrum_ring, h=coil_thick);
-	  // TODO: make this a better point.
-	  translate([-coil_thick/2, fulcrum_distance/2, coil_height/2]) rotate([0, 90, 0]) cylinder(r=2*fulcrum_dia + fulcrum_ring, h=coil_thick);
-     }
+
 }
 
 module coil_triplet() {
