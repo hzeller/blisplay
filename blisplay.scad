@@ -1,83 +1,131 @@
-$fn=96;
-loose_fit=0.5;
-tight_fit=0.2;
-wall_thick=0.5;
-wire_space=2;
-mag_thick=1.5;
-mag_length=19;
-mag_width=6.4;
+$fn=32;
+e=0.01;
 
-// magnet. centered around x, y; flat on z.
-module magnet(extra=0) {
-    cube([mag_thick+extra, mag_length+extra, mag_width+extra], center=true);
-}
+mag_len=1.5*25.4;
+mag_w=25.4/4;
+mag_thick=25.4/4;
 
-module magnet_punch(extra=0) {
-    cube([mag_thick+extra, mag_length+extra, 2 * mag_width + 1 + extra], center=true);
-}
+dots_x=4;
+dots_y=6;
+dot_dist=2;
+dot_dia=1;
 
-module mount_triangle(points=[[0,0],[1,0],[1,1]], depth=1) {
-    linear_extrude(height=depth) polygon(points);
-}
+coil_height=3*mag_w;
+coil_thick=0.4;
+coil_short=0;  // leave space to move at end.. typically !needed b/c yoke_space
 
-module spool_holder() {
-    translate([0, (mag_length + loose_fit)/2, mag_width/2+wall_thick]) difference() {
-	union() {
-	    magnet(loose_fit + wall_thick);
-	    translate([0, 0, (mag_width + wall_thick)/2]) cube([mag_thick + loose_fit + wall_thick + wire_space, mag_length + loose_fit + wall_thick + wire_space, wall_thick], center=true);
-	    translate([0, 0, -(mag_width+wall_thick)/2]) cube([mag_thick + wall_thick + wire_space, mag_length + wall_thick + wire_space, wall_thick], center=true);
-	}
-	#magnet_punch(loose_fit);
-    }
-}
+top_yoke=true;
+yoke_thick=mag_w;  // Good size to capture all magnets.
+yoke_space=4;   // Space around magnets.
 
-module base_plane() {
-    difference() {
-	cylinder(r=32, h=1);
-	for (i=[0:11]) {
-	    rotate([0, 0, i * 360/12 + 360/24]) translate([0, 20, -1]) magnet(tight_fit);
-	}
-    }
-}
+center_w=dots_x * dot_dist;
+yoke_width = center_w + 2*mag_thick+2*yoke_thick;
+yoke_len = mag_len + 2*yoke_thick + 2*yoke_space;
 
-module spools() {
-    for (i=[0:11]) {
-	rotate([0, 0, i * 360/12 + 360/24]) translate([0, 10, 0]) spool_holder();
-    }
-}
+poke_len=2;
+fingerpad_thick=0.7;
 
-module finger_pad(d=2,x=4,y=6,thick=0.7) {
-    translate([-x*d/2, -y*d/2, 0]) difference() {
+fulcrum_dia=2;
+fulcrum_ring=1;
+fulcrum_distance=(mag_len + yoke_thick)/2 + yoke_space;
+
+echo("Coil size: ", coil_height + poke_len, "x",
+     fulcrum_distance+fulcrum_dia+fulcrum_ring);
+
+module finger_pad(d=dot_dist,x=dots_x,y=dots_y,thick=fingerpad_thick) {
+     color([0.5, 0.5, 0.9, 0.5]) translate([-x*d/2, -y*d/2, 0]) difference() {
 	cube([x*d, y*d, thick]);
 	for (px=[0:x-1]) {
 	    for (py=[0:y-1]) {
-		translate([px*d+d/2, py*d+d/2, -thick/2]) cylinder(r=d/5,h=2*thick);
+		translate([px*d+d/2, py*d+d/2, -thick/2]) cylinder(r=dot_dia/2,h=2*thick);
 	    }
 	}
     }
 }
 
-module spools1() {
-    // top left
-    translate([-3, 8, 0]) spool_holder();
-    translate([-8, 8, 0]) rotate([0, 0, 45]) spool_holder();
-    translate([-8, 2.5, 0]) rotate([0, 0, 90]) spool_holder();
-
-    // bottom left.
-    translate([-3, -27, 0]) spool_holder();
-    translate([-21, -21, 0]) rotate([0, 0, -45]) spool_holder();
-    translate([-8, -2.5, 0]) rotate([0, 0, 90]) spool_holder();
+module magnet() {
+     color("red") translate([-mag_thick/2,-mag_len/2,0]) cube([mag_thick/2, mag_len, mag_w]);
+     color("green") translate([0,-mag_len/2,0]) cube([mag_thick/2, mag_len, mag_w]);
 }
 
-module ttest() {
-    color("red") spool_holder();
-    mount_triangle([[-(mag_thick+loose_fit+wire_space)/2, 0],
-	    [+(mag_thick+loose_fit+wire_space)/2, 0],
-	    [0, -8]], wall_thick);
+module yoke(with_magnet=true) {
+     difference() {
+	  color([0.5, 0.5, 0.5, 0.6]) translate([0,0,mag_w/2]) cube([yoke_width, yoke_len, mag_w-e], center=true);
+	  translate([0,0,mag_w/2]) cube([center_w + 2*mag_thick, mag_len+2*yoke_space, mag_w+2], center=true);
+     }
+     if (with_magnet) {
+	  translate([-(center_w+mag_thick)/2, 0, 0]) magnet();
+	  translate([+(center_w+mag_thick)/2, 0, 0]) magnet();
+     }
 }
-spools();
-//color("green") spools1();
-translate([0, 0, 8]) color("blue") finger_pad();
-//base_plane();
-//color("green") scrap();
-//mount_triangle();
+
+module coil(poke_pos=0) {
+     poke_width=dot_dia/2;
+     translate([-coil_thick/2, (dot_dist-poke_width)/2, 0]) {
+	  color("yellow") cube([coil_thick, mag_len/2-coil_short, coil_height]);
+	  color("pink") translate([0, poke_pos*dot_dist, coil_height]) cube([coil_thick, dot_dia/2, poke_len]);
+     }
+     color("yellow") hull() {
+	  translate([-coil_thick/2, fulcrum_distance, coil_height/2]) rotate([0, 90, 0]) cylinder(r=fulcrum_dia/2 + fulcrum_ring, h=coil_thick);
+	  // TODO: make this a better point.
+	  translate([-coil_thick/2, fulcrum_distance/2, coil_height/2]) rotate([0, 90, 0]) cylinder(r=2*fulcrum_dia + fulcrum_ring, h=coil_thick);
+     }
+}
+
+module coil_triplet() {
+     translate([-dot_dist/3, 0, 0]) coil(0);
+     angle = 0;
+     translate([0, fulcrum_distance, coil_height/2]) rotate([angle,0,0])
+	  translate([0, -fulcrum_distance, -coil_height/2]) coil(1);
+     translate([dot_dist/3, 0, 0]) coil(2);
+}
+
+module coil_stack() {
+     //translate([0, 0, coil_height+poke_len-fingerpad_thick-0.2]) finger_pad();
+
+     translate([-1.5*dot_dist, 0, 0]) coil_triplet();
+     translate([-0.5*dot_dist, 0, 0]) coil_triplet();
+     translate([0.5*dot_dist, 0, 0]) coil_triplet();
+     translate([1.5*dot_dist, 0, 0]) coil_triplet();
+}
+
+module actuators() {
+     rotate([0,0,180]) coil_stack();
+     coil_stack();
+}
+
+module magnet_assembly() {
+     yoke();
+     if (top_yoke) translate([0,0,coil_height-mag_w]) rotate([0,0,180]) yoke();
+
+     fulcrum_len=dots_x * dot_dist + 2*mag_thick;
+     color("silver") translate([0, fulcrum_distance, coil_height/2])
+	  rotate([0,90,0]) translate([0,0,-fulcrum_len/2]) cylinder(r=fulcrum_dia/2, h=fulcrum_len);
+     color("silver") translate([0, -fulcrum_distance, coil_height/2])
+	  rotate([0,90,0]) translate([0,0,-fulcrum_len/2]) cylinder(r=fulcrum_dia/2, h=fulcrum_len);
+}
+
+//actuators();
+//magnet_assembly();
+
+//yoke(false);
+
+module yoke_spacer() {
+     smaller_yoke_space=yoke_space-0.3;
+     translate([center_w/2, 0, 0]) {
+	  difference() {
+	       translate([0, -yoke_len/2, 0]) cube([2*mag_w, yoke_len, mag_w]);
+	       translate([-yoke_width/2, fulcrum_distance, (coil_height-2*mag_w)/2]) rotate([0,90,0]) cylinder(r=fulcrum_dia/2+0.2, h=yoke_width);
+	       translate([-yoke_width/2, -fulcrum_distance, (coil_height-2*mag_w)/2]) rotate([0,90,0]) cylinder(r=fulcrum_dia/2+0.2, h=yoke_width);
+	  }
+	  translate([0, yoke_len/2 - yoke_thick - smaller_yoke_space, 0]) cube([mag_w, smaller_yoke_space, 2*mag_w]);
+	  translate([0, -yoke_len/2+yoke_thick, 0]) cube([mag_w, smaller_yoke_space, 2*mag_w]);
+     }
+}
+
+//translate([0,0,mag_w]) yoke_spacer();
+//rotate([0,0,180]) translate([0,0,mag_w]) yoke_spacer();
+magnet_assembly();
+actuators();
+
+//yoke_spacer();
