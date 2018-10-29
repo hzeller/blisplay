@@ -1,25 +1,38 @@
 $fn=32;
 e=0.01;
 
-mag_len=1.5*25.4;
-mag_w=25.4/4;
-mag_thick=25.4/4;
-
+// The "display" dots.
 dots_x=4;
 dots_y=6;
 dot_dist=2;
 dot_dia=1;
+
+// The magnets.
+mag_len=1.5*25.4;
+mag_w=25.4/4;
+mag_thick=25.4/4;
+
+// Driver PCB.
+driver_board_width=36;
+driver_board_len=28;
+driver_board_frame = 1;  // Frame around driver board to hold it.
+driver_board_offset=15;  // first solder point that needs to be outside
+driver_board_thick=1.6;
+
+driver_board_space_needed = driver_board_width + 2 * driver_board_frame;
 
 coil_height=3*mag_w;
 coil_thick=0.4;
 coil_short=0;  // leave space to move at end.. typically !needed b/c yoke_space
 
 top_yoke=true;
-yoke_thick=mag_w;  // Good size to capture all magnets.
-yoke_space=4;   // Space around magnets.
+yoke_thick=1.2*mag_w;  // Good size to capture field-lines.
+yoke_space=4;          // Space around magnets.
+yoke_transparency = 1;
 
 center_w=dots_x * dot_dist;
-yoke_width = center_w + 2*mag_thick+2*yoke_thick;
+yoke_width = max(center_w + 2*mag_thick+2*yoke_thick,
+		 driver_board_space_needed);
 yoke_len = mag_len + 2*yoke_thick + 2*yoke_space;
 
 poke_len=2;
@@ -48,10 +61,15 @@ module magnet() {
      color("green") translate([0,-mag_len/2,0]) cube([mag_thick/2, mag_len, mag_w]);
 }
 
-module yoke(with_magnet=true) {
+module yoke(with_magnet=false, is_bottom=true) {
+     extra_bottom = is_bottom ? driver_board_thick : 0;
      difference() {
-	  color([0.5, 0.5, 0.5, 0.6]) translate([0,0,mag_w/2]) cube([yoke_width, yoke_len, mag_w-e], center=true);
-	  translate([0,0,mag_w/2]) cube([center_w + 2*mag_thick, mag_len+2*yoke_space, mag_w+2], center=true);
+	  color([0.5, 0.5, 0.5, yoke_transparency]) translate([0,0,mag_w/2 - extra_bottom/2]) cube([yoke_width, yoke_len, mag_w + extra_bottom - e], center=true);
+	  translate([0,0,mag_w/2]) cube([center_w + 2*mag_thick, mag_len+2*yoke_space, mag_w + 2 * extra_bottom + e], center=true);
+
+	  if (is_bottom) {
+	       translate([0,0,-e]) driver_board_assembly(realistic=false);
+	  }
      }
      if (with_magnet) {
 	  translate([-(center_w+mag_thick)/2, 0, 0]) magnet();
@@ -61,7 +79,7 @@ module yoke(with_magnet=true) {
 
 module coil(poke_pos=0) {
      poke_width=0.8;
-     difference() {
+     render() difference() {
 	  color("yellow")
 	       translate([0, (dot_dist-poke_width)/2, 0]) rotate([90, 0, 90])
 	       linear_extrude(height=coil_thick, center=true, convexity = 10)
@@ -74,7 +92,6 @@ module coil(poke_pos=0) {
 	       }
 	  }
      }
-
 }
 
 module coil_triplet() {
@@ -86,22 +103,22 @@ module coil_triplet() {
 }
 
 module coil_stack() {
-     //translate([0, 0, coil_height+poke_len-fingerpad_thick-0.2]) finger_pad();
-
-     translate([-1.5*dot_dist, 0, 0]) coil_triplet();
-     translate([-0.5*dot_dist, 0, 0]) coil_triplet();
-     translate([0.5*dot_dist, 0, 0]) coil_triplet();
-     translate([1.5*dot_dist, 0, 0]) coil_triplet();
+     offset = (dots_x-1) * dot_dist / 2.0;
+     for (i = [0:1:dots_x-e]) {
+	  translate([i * dot_dist - offset, 0, 0]) coil_triplet();
+     }
 }
 
 module actuators() {
+     //translate([0, 0, coil_height+poke_len-fingerpad_thick-0.2]) finger_pad();
+
      rotate([0,0,180]) coil_stack();
      coil_stack();
 }
 
 module magnet_assembly() {
-     yoke();
-     if (top_yoke) translate([0,0,coil_height-mag_w]) rotate([0,0,180]) yoke();
+     yoke(with_magnet=true, is_bottom=true);
+     if (top_yoke) translate([0,0,coil_height-mag_w]) rotate([0,0,180]) yoke(with_magnet=true, is_bottom=false);
 
      fulcrum_len=dots_x * dot_dist + 2*mag_thick;
      color("silver") translate([0, fulcrum_distance, coil_height/2])
@@ -110,10 +127,21 @@ module magnet_assembly() {
 	  rotate([0,90,0]) translate([0,0,-fulcrum_len/2]) cylinder(r=fulcrum_dia/2, h=fulcrum_len);
 }
 
-//actuators();
-//magnet_assembly();
+module driver_board(realistic=true) {
+     rotate([0,0,90]) translate([-driver_board_offset, -driver_board_width/2, 0]) {
+	  if (realistic) {
+	       color("purple") translate([-70, 66.45, 0])
+		    import(file="blisplay-driver.stl");
+	  } else {
+	       cube([driver_board_len, driver_board_width, driver_board_thick]);
+	  }
+     }
+}
 
-//yoke(false);
+module driver_board_assembly(realistic=true) {
+     translate([0, yoke_len/2, -driver_board_thick]) driver_board(realistic);
+     translate([0, -yoke_len/2, -driver_board_thick]) rotate([0,0,180]) driver_board(realistic);
+}
 
 module yoke_spacer() {
      smaller_yoke_space=yoke_space-0.3;
@@ -128,9 +156,12 @@ module yoke_spacer() {
      }
 }
 
-//translate([0,0,mag_w]) yoke_spacer();
-//rotate([0,0,180]) translate([0,0,mag_w]) yoke_spacer();
-magnet_assembly();
-actuators();
+module assembly() {
+     actuators();
+     translate([0,0,mag_w]) yoke_spacer();
+     rotate([0,0,180]) translate([0,0,mag_w]) yoke_spacer();
+     magnet_assembly();
+     driver_board_assembly(true);
+}
 
-//yoke_spacer();
+assembly();
