@@ -42,8 +42,12 @@ fulcrum_dia=2;
 fulcrum_ring=1;
 fulcrum_distance=(mag_len + yoke_wall)/2 + yoke_space;
 
+mount_holes_in_yoke_spacer = [ -12, 12 ];
+
 echo("Coil size: ", coil_height + poke_len, "x",
      fulcrum_distance+fulcrum_dia+fulcrum_ring);
+echo("Mount hole distance: ",
+     mount_holes_in_yoke_spacer[1] - mount_holes_in_yoke_spacer[0], "mm");
 
 module finger_pad(d=dot_dist,x=dots_x,y=dots_y,thick=fingerpad_thick) {
      color([0.5, 0.5, 0.9, 0.5]) translate([-x*d/2, -y*d/2, 0]) difference() {
@@ -143,9 +147,13 @@ module driver_board_assembly(realistic=true) {
      translate([0, -yoke_len/2, -driver_board_thick]) rotate([0,0,180]) driver_board(realistic);
 }
 
+// TODO: this is a lot of empty space in the yoke-spacer, that we can fill
+// with electronics later.
 module yoke_spacer() {
-     // TODO: this is a lot of empty space that we can fill with electronics.
-     smaller_yoke_space=yoke_space-0.3;
+     mount_dia=2.7;  // A bit smaller than M3: We want to thread through it
+     wiggle_room = 0.25;
+     // Leave wiggle-room for magnet on one side, yoke on other
+     smaller_yoke_space=yoke_space-2*wiggle_room;
      color("#FFBB00") translate([center_w/2, 0, 0]) {
 	  difference() {
 	       yoke_outer_wall = (yoke_width - center_w)/2;
@@ -155,12 +163,22 @@ module yoke_spacer() {
 	       // Holes for the fulcrum
 	       translate([-yoke_width/2, fulcrum_distance, (coil_height-2*mag_w)/2]) rotate([0,90,0]) cylinder(r=fulcrum_dia/2+0.2, h=yoke_width);
 	       translate([-yoke_width/2, -fulcrum_distance, (coil_height-2*mag_w)/2]) rotate([0,90,0]) cylinder(r=fulcrum_dia/2+0.2, h=yoke_width);
+
+	       // Tapping holes to mount.
+	       for (m = mount_holes_in_yoke_spacer) {
+		    translate([-yoke_width/2, m, (coil_height-2*mag_w)/2]) rotate([0,90,0]) cylinder(r=mount_dia/2, h=yoke_width);
+	       }
 	  }
 
 	  // The spacers around the magnets
-	  translate([0, yoke_len/2 - yoke_wall - smaller_yoke_space, -mag_w]) cube([mag_w, smaller_yoke_space, coil_height]);
-	  translate([0, -yoke_len/2+yoke_wall, -mag_w]) cube([mag_w, smaller_yoke_space, coil_height]);
+	  translate([0, yoke_len/2 - yoke_wall - smaller_yoke_space - wiggle_room, -mag_w]) cube([mag_w, smaller_yoke_space, coil_height]);
+	  translate([0, -yoke_len/2+yoke_wall + wiggle_room, -mag_w]) cube([mag_w, smaller_yoke_space, coil_height]);
      }
+}
+
+module print_yoke_spacers() {
+     rotate([0, -90, 0]) yoke_spacer();
+     translate([15, 5, 0]) rotate([0, -90, 0]) yoke_spacer();
 }
 
 module assembly() {
@@ -174,4 +192,3 @@ module assembly() {
 }
 
 assembly();
-//yoke_spacer();
