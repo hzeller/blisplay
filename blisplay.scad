@@ -26,21 +26,21 @@ coil_thick=0.4;
 coil_short=0;  // leave space to move at end.. typically !needed b/c yoke_space
 
 top_yoke=true;
-yoke_thick=1.2*mag_w;  // Good size to capture field-lines.
+yoke_wall=1.2*mag_w;  // Large enough to capture most field-lines.
 yoke_space=4;          // Space around magnets.
 yoke_transparency = 1;
 
 center_w=dots_x * dot_dist;
-yoke_width = max(center_w + 2*mag_thick+2*yoke_thick,
+yoke_width = max(center_w + 2*mag_thick+2*yoke_wall,
 		 driver_board_space_needed);
-yoke_len = mag_len + 2*yoke_thick + 2*yoke_space;
+yoke_len = mag_len + 2*yoke_wall + 2*yoke_space;
 
 poke_len=2;
 fingerpad_thick=0.7;
 
 fulcrum_dia=2;
 fulcrum_ring=1;
-fulcrum_distance=(mag_len + yoke_thick)/2 + yoke_space;
+fulcrum_distance=(mag_len + yoke_wall)/2 + yoke_space;
 
 echo("Coil size: ", coil_height + poke_len, "x",
      fulcrum_distance+fulcrum_dia+fulcrum_ring);
@@ -144,24 +144,34 @@ module driver_board_assembly(realistic=true) {
 }
 
 module yoke_spacer() {
+     // TODO: this is a lot of empty space that we can fill with electronics.
      smaller_yoke_space=yoke_space-0.3;
-     translate([center_w/2, 0, 0]) {
+     color("#FFBB00") translate([center_w/2, 0, 0]) {
 	  difference() {
-	       translate([0, -yoke_len/2, 0]) cube([2*mag_w, yoke_len, mag_w]);
+	       yoke_outer_wall = (yoke_width - center_w)/2;
+	       spacer_high = coil_height - 2*mag_w;
+	       translate([0, -yoke_len/2, 0]) cube([yoke_outer_wall, yoke_len, spacer_high]);
+
+	       // Holes for the fulcrum
 	       translate([-yoke_width/2, fulcrum_distance, (coil_height-2*mag_w)/2]) rotate([0,90,0]) cylinder(r=fulcrum_dia/2+0.2, h=yoke_width);
 	       translate([-yoke_width/2, -fulcrum_distance, (coil_height-2*mag_w)/2]) rotate([0,90,0]) cylinder(r=fulcrum_dia/2+0.2, h=yoke_width);
 	  }
-	  translate([0, yoke_len/2 - yoke_thick - smaller_yoke_space, 0]) cube([mag_w, smaller_yoke_space, 2*mag_w]);
-	  translate([0, -yoke_len/2+yoke_thick, 0]) cube([mag_w, smaller_yoke_space, 2*mag_w]);
+
+	  // The spacers around the magnets
+	  translate([0, yoke_len/2 - yoke_wall - smaller_yoke_space, -mag_w]) cube([mag_w, smaller_yoke_space, coil_height]);
+	  translate([0, -yoke_len/2+yoke_wall, -mag_w]) cube([mag_w, smaller_yoke_space, coil_height]);
      }
 }
 
 module assembly() {
      actuators();
-     translate([0,0,mag_w]) yoke_spacer();
-     rotate([0,0,180]) translate([0,0,mag_w]) yoke_spacer();
+     translate([0,0,mag_w]) {
+	  yoke_spacer();
+	  rotate([0,0,180]) yoke_spacer();
+     }
      magnet_assembly();
      driver_board_assembly(true);
 }
 
 assembly();
+//yoke_spacer();
