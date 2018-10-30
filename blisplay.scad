@@ -65,11 +65,13 @@ module magnet() {
      color("green") translate([0,-mag_len/2,0]) cube([mag_thick/2, mag_len, mag_w]);
 }
 
-module yoke(with_magnet=false, is_bottom=true) {
+module yoke(yoke_height=mag_w, border_thin=0, with_magnet=false, is_bottom=true) {
      extra_bottom = is_bottom ? driver_board_thick : 0;
      difference() {
-	  color([0.5, 0.5, 0.5, yoke_transparency]) translate([0,0,mag_w/2 - extra_bottom/2]) cube([yoke_width, yoke_len, mag_w + extra_bottom - e], center=true);
-	  translate([0,0,mag_w/2]) cube([center_w + 2*mag_thick, mag_len+2*yoke_space, mag_w + 2 * extra_bottom + e], center=true);
+	  color([0.5, 0.5, 0.5, yoke_transparency])
+	       translate([0,0,yoke_height/2 - extra_bottom/2])
+	       cube([yoke_width-2*border_thin, yoke_len-2*border_thin, yoke_height + extra_bottom - e], center=true);
+	  translate([0,0,yoke_height/2]) cube([center_w + 2*mag_thick + 2*border_thin, mag_len+2*yoke_space + 2*border_thin, yoke_height + 2 * extra_bottom + e], center=true);
 
 	  if (is_bottom) {
 	       translate([0,0,-e]) driver_board_assembly(realistic=false);
@@ -150,7 +152,8 @@ module driver_board_assembly(realistic=true) {
 // TODO: this is a lot of empty space in the yoke-spacer, that we can fill
 // with electronics later.
 module yoke_spacer() {
-     mount_dia=2.7;  // A bit smaller than M3: We want to thread through it
+     do_tapping = true;  // otherwise overhang.
+     mount_dia=do_tapping ? 2.7 : 3.2;
      wiggle_room = 0.25;
      // Leave wiggle-room for magnet on one side, yoke on other
      smaller_yoke_space=yoke_space-2*wiggle_room;
@@ -160,13 +163,16 @@ module yoke_spacer() {
 	       spacer_high = coil_height - 2*mag_w;
 	       translate([0, -yoke_len/2, 0]) cube([yoke_outer_wall, yoke_len, spacer_high]);
 
-	       // Holes for the fulcrum
-	       translate([-yoke_width/2, fulcrum_distance, (coil_height-2*mag_w)/2]) rotate([0,90,0]) cylinder(r=fulcrum_dia/2+0.2, h=yoke_width);
-	       translate([-yoke_width/2, -fulcrum_distance, (coil_height-2*mag_w)/2]) rotate([0,90,0]) cylinder(r=fulcrum_dia/2+0.2, h=yoke_width);
+	       // Holes for the fulcrum. Not entirely punched through to the end
+	       translate([-e, fulcrum_distance, spacer_high/2]) rotate([0,90,0]) #cylinder(r=fulcrum_dia/2+0.2, h=yoke_outer_wall-1);
+	       translate([-e, -fulcrum_distance, spacer_high/2]) rotate([0,90,0]) cylinder(r=fulcrum_dia/2+0.2, h=yoke_outer_wall-1);
 
 	       // Tapping holes to mount.
 	       for (m = mount_holes_in_yoke_spacer) {
 		    translate([-yoke_width/2, m, (coil_height-2*mag_w)/2]) rotate([0,90,0]) cylinder(r=mount_dia/2, h=yoke_width);
+		    if (!do_tapping) { // then hole for nut
+			 translate([yoke_outer_wall-4, m, 0]) cube([3, 5.4, 30], center=true);
+		    }
 	       }
 	  }
 
@@ -181,6 +187,7 @@ module print_yoke_spacers() {
      translate([15, 5, 0]) rotate([0, -90, 0]) yoke_spacer();
 }
 
+// This is how it all looks.
 module assembly() {
      actuators();
      translate([0,0,mag_w]) {
@@ -189,6 +196,21 @@ module assembly() {
      }
      magnet_assembly();
      driver_board_assembly(true);
+}
+
+// Tool to hold up spacer while assembling
+module assembly_holder() {
+     bottom_thick=1;
+     spacer_high = coil_height - 2*mag_w;
+     yoke_outer_wall = (yoke_width - center_w)/2;
+     difference() {
+	  hull() {
+	       translate([0,10,0]) cylinder(r=15, h=bottom_thick);
+	       translate([0,-10,0]) cylinder(r=15, h=bottom_thick);
+	       translate([0,0,yoke_outer_wall]) cube([spacer_high+2, mag_len-mag_w, 1], center=true);
+	  }
+	  translate([0,0,10+bottom_thick]) cube([spacer_high+0.2, 60, 20], center=true);
+     }
 }
 
 assembly();
