@@ -211,14 +211,45 @@ module print_yoke_spacers() {
 }
 
 // Create a 2D projection of the side-wall to laser-cut.
-module print_sidewall() {
+module lasercut_sidewall() {
      projection(cut = true) rotate([0, 90, 0]) side_wall();
      projection(cut = true) translate([39, 0, 0]) rotate([0, -90, 0]) side_wall();
 }
 
-module print_yokes() {
+module print_yokes_magnetic_filament() {
      translate([0,0,mag_w]) rotate([0,180,0]) yoke(with_magnet=false, is_bottom=true);
      translate([yoke_width + 2, 0, 0]) yoke(with_magnet=false, is_bottom=false);
+}
+
+// In case the yoke is to be printed hollow to be filled with iron filings,
+// then a lid put on top.
+// Requires support and in general is a little messy.
+// Set slicer to 0% infill, no top-shell and support material.
+// Generate by explicitly calling
+//   make fab/print_yokes_hollow.stl
+module print_yokes_hollow() {
+     // Bottom with lid
+     translate([0,0,driver_board_thick]) yoke(with_magnet=false, is_bottom=true);
+     translate([0, yoke_len+2, 0]) yoke(yoke_height=0.4, border_thin=1, is_bottom=false);
+
+     // Top with lid
+     translate([yoke_width + 2, 0, 0]) yoke(with_magnet=false, is_bottom=false);
+     translate([yoke_width + 2, yoke_len + 2, 0]) yoke(yoke_height=0.4, border_thin=1, is_bottom=false);
+}
+
+// Tool to hold up spacer while assembling
+module assembly_tool_spacer_holder() {
+     bottom_thick=1;
+     spacer_high = coil_height - 2*mag_w;
+     yoke_outer_wall = (yoke_width - center_w)/2;
+     difference() {
+	  hull() {
+	       translate([0,10,0]) cylinder(r=15, h=bottom_thick);
+	       translate([0,-10,0]) cylinder(r=15, h=bottom_thick);
+	       translate([0,0,yoke_outer_wall]) cube([spacer_high+2, mag_len-mag_w, 1], center=true);
+	  }
+	  translate([0,0,10+bottom_thick]) cube([spacer_high+0.2, 60, 20], center=true);
+     }
 }
 
 // This is how it all looks.
@@ -233,21 +264,6 @@ module assembly() {
 
      translate([yoke_width/2 + acrylic_t/2, 0, 0]) side_wall();
      translate([-yoke_width/2 - acrylic_t/2, 0, 0]) side_wall();
-}
-
-// Tool to hold up spacer while assembling
-module assembly_holder() {
-     bottom_thick=1;
-     spacer_high = coil_height - 2*mag_w;
-     yoke_outer_wall = (yoke_width - center_w)/2;
-     difference() {
-	  hull() {
-	       translate([0,10,0]) cylinder(r=15, h=bottom_thick);
-	       translate([0,-10,0]) cylinder(r=15, h=bottom_thick);
-	       translate([0,0,yoke_outer_wall]) cube([spacer_high+2, mag_len-mag_w, 1], center=true);
-	  }
-	  translate([0,0,10+bottom_thick]) cube([spacer_high+0.2, 60, 20], center=true);
-     }
 }
 
 assembly();
