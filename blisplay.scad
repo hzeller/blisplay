@@ -211,9 +211,14 @@ module print_yoke_spacers() {
 }
 
 // Create a 2D projection of the side-wall to laser-cut.
-module print_sidewall_dxf() {
+module print_sidewall() {
      projection(cut = true) rotate([0, 90, 0]) side_wall();
      projection(cut = true) translate([39, 0, 0]) rotate([0, -90, 0]) side_wall();
+}
+
+module print_yokes() {
+     translate([0,0,mag_w]) rotate([0,180,0]) yoke(with_magnet=false, is_bottom=true);
+     translate([yoke_width + 2, 0, 0]) yoke(with_magnet=false, is_bottom=false);
 }
 
 // This is how it all looks.
