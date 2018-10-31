@@ -1,6 +1,8 @@
 $fn=32;
 e=0.01;
 
+acrylic_t = 3;   // Acrylic thickness for laser-cut parts
+
 // The "display" dots.
 dots_x=4;
 dots_y=6;
@@ -26,7 +28,7 @@ coil_thick=0.4;
 coil_short=0;  // leave space to move at end.. typically !needed b/c yoke_space
 
 top_yoke=true;
-yoke_wall=1.2*mag_w;  // Large enough to capture most field-lines.
+yoke_wall=1.2*mag_w;   // Large enough to capture most field-lines.
 yoke_space=4;          // Space around magnets.
 yoke_transparency = 1;
 
@@ -43,6 +45,8 @@ fulcrum_ring=1;
 fulcrum_distance=(mag_len + yoke_wall)/2 + yoke_space;
 
 mount_holes_in_yoke_spacer = [ -12, 12 ];
+
+optical_clearance = 30;   // Clearance at the bottom for the optical system
 
 echo("Coil size: ", coil_height + poke_len, "x",
      fulcrum_distance+fulcrum_dia+fulcrum_ring);
@@ -182,9 +186,34 @@ module yoke_spacer() {
      }
 }
 
+module side_wall() {
+     bottom_wide = yoke_len + 2*(driver_board_len - driver_board_offset);
+     bottom_radius=5;
+
+     difference() {
+	  color([0.5, 0.5, 0.5, 0.2]) hull() {
+	       translate([0, 0, coil_height/2]) cube([acrylic_t, yoke_len, coil_height], center=true);
+	       cube([acrylic_t, bottom_wide, e], center=true);
+
+	       translate([-acrylic_t/2, bottom_wide/2 - bottom_radius, -optical_clearance+bottom_radius]) rotate([0, 90, 0]) cylinder(r=bottom_radius, h=acrylic_t);
+	       translate([-acrylic_t/2, -bottom_wide/2 + bottom_radius, -optical_clearance+bottom_radius]) rotate([0, 90, 0]) cylinder(r=bottom_radius, h=acrylic_t);
+	  }
+
+	  for (m = mount_holes_in_yoke_spacer) {
+	       translate([-acrylic_t/2-e, m, (coil_height-2*mag_w)/2 + mag_w]) rotate([0,90,0]) cylinder(r=3.2/2, h=acrylic_t+2*e);
+	  }
+     }
+}
+
 module print_yoke_spacers() {
      rotate([0, -90, 0]) yoke_spacer();
      translate([15, 5, 0]) rotate([0, -90, 0]) yoke_spacer();
+}
+
+// Create a 2D projection of the side-wall to laser-cut.
+module print_sidewall_dxf() {
+     projection(cut = true) rotate([0, 90, 0]) side_wall();
+     projection(cut = true) translate([39, 0, 0]) rotate([0, -90, 0]) side_wall();
 }
 
 // This is how it all looks.
@@ -196,6 +225,9 @@ module assembly() {
      }
      magnet_assembly();
      driver_board_assembly(true);
+
+     translate([yoke_width/2 + acrylic_t/2, 0, 0]) side_wall();
+     translate([-yoke_width/2 - acrylic_t/2, 0, 0]) side_wall();
 }
 
 // Tool to hold up spacer while assembling
