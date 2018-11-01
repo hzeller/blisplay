@@ -3,7 +3,7 @@
 
 TARGET_ARCH=-mmcu=attiny85
 CXX=avr-g++
-CXXFLAGS=-Os -g -Wall -Wextra -ffunction-sections -fdata-sections -mcall-prologues
+CXXFLAGS=-Os -g -Wall -Wextra -ffunction-sections -fdata-sections -mcall-prologues -Wmissing-field-initializers -std=c++11
 AVRDUDE_DEVICE ?= /dev/ttyUSB0
 AVRDUDE     = avrdude -p t85 -c stk500v2 -P $(AVRDUDE_DEVICE)
 FLASH_CMD   = $(AVRDUDE) -e -U flash:w:main.hex
