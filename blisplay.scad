@@ -38,6 +38,7 @@ yoke_width = max(center_w + 2*mag_thick+2*yoke_wall,
 yoke_len = mag_len + 2*yoke_wall + 2*yoke_space;
 
 poke_len=2;
+poke_angle=3;
 fingerpad_thick=0.7;
 
 fulcrum_dia=2;
@@ -55,13 +56,19 @@ echo("Mount hole distance: ",
 
 module finger_pad(d=dot_dist,x=dots_x,y=dots_y,thick=fingerpad_thick) {
      color([0.5, 0.5, 0.9, 0.5]) translate([-x*d/2, -y*d/2, 0]) difference() {
-	cube([x*d, y*d, thick]);
+	  translate([-1, -1, 0]) cube([x*d + 2, y*d + 2, thick]);
 	for (px=[0:x-1]) {
-	    for (py=[0:y-1]) {
-		translate([px*d+d/2, py*d+d/2, -thick/2]) cylinder(r=dot_dia/2,h=2*thick);
-	    }
+	     for (py=[0:y-1]) {
+		  first_half = py < y/2;
+		  x_offset = (py-1)*dot_dist/3 - dot_dist * (first_half ? 0 : 1);
+		  y_offset = first_half ? -0.3 : 0.3;
+		  translate([px*d +d/2 + x_offset,
+			     py*d + d/2 + y_offset,
+			     -thick/2])
+		       scale([1, 1.6]) cylinder(r=dot_dia/2,h=2*thick);
+	     }
 	}
-    }
+     }
 }
 
 module magnet() {
@@ -87,9 +94,12 @@ module yoke(yoke_height=mag_w, border_thin=0, with_magnet=false, is_bottom=true)
      }
 }
 
-module coil(poke_pos=0) {
+module coil(poke_pos=0, is_poke) {
+     //echo(poke_pos, " -> ", is_poke);
      poke_width=0.8;
-     render() difference() {
+     translate([0, fulcrum_distance-0.5, coil_height/2])
+     rotate([is_poke ? -poke_angle : 0, 0, 0]) translate([0, -fulcrum_distance+0.5, -coil_height/2])
+	  render() difference() {
 	  color("yellow")
 	       translate([0, (dot_dist-poke_width)/2, 0]) rotate([90, 0, 90])
 	       linear_extrude(height=coil_thick, center=true, convexity = 10)
@@ -104,26 +114,34 @@ module coil(poke_pos=0) {
      }
 }
 
-module coil_triplet() {
-     translate([-dot_dist/3, 0, 0]) coil(0);
+module coil_triplet(x_pos, poke_array) {
+     translate([-dot_dist/3, 0, 0])
+	  coil(0, is_poke=poke_array[2*dots_x + x_pos]);
      angle = 0;
      translate([0, fulcrum_distance, coil_height/2]) rotate([angle,0,0])
-	  translate([0, -fulcrum_distance, -coil_height/2]) coil(1);
-     translate([dot_dist/3, 0, 0]) coil(2);
+	  translate([0, -fulcrum_distance, -coil_height/2])
+	  coil(1, is_poke=poke_array[1*dots_x + x_pos]);
+     translate([dot_dist/3, 0, 0])
+	  coil(2, is_poke=poke_array[0*dots_x + x_pos]);
 }
 
-module coil_stack() {
+module coil_stack(poke_array) {
+     //echo("poke", poke_array);
      offset = (dots_x-1) * dot_dist / 2.0;
      for (i = [0:1:dots_x-e]) {
-	  translate([i * dot_dist - offset, 0, 0]) coil_triplet();
+	  translate([i * dot_dist - offset, 0, 0])
+	       coil_triplet(i, poke_array);
      }
 }
 
-module actuators() {
-     //translate([0, 0, coil_height+poke_len-fingerpad_thick-0.2]) finger_pad();
+module actuators(poke_array) {
+     //translate([0, 0, coil_height+poke_len-fingerpad_thick+1.5]) finger_pad();
 
-     rotate([0,0,180]) coil_stack();
-     coil_stack();
+     rotate([0,0,180]) coil_stack(poke_array=poke_array);
+
+     // The back is rotated and turned, so easy if we just map flipped array
+     reflect_array = [for (i = [0:24]) poke_array[23-i]];
+     coil_stack(poke_array=reflect_array);
 }
 
 module magnet_assembly() {
@@ -253,8 +271,8 @@ module assembly_tool_spacer_holder() {
 }
 
 // This is how it all looks.
-module assembly() {
-     actuators();
+module assembly(poke_array=[]) {
+     actuators(poke_array);
      translate([0,0,mag_w]) {
 	  yoke_spacer();
 	  rotate([0,0,180]) yoke_spacer();
