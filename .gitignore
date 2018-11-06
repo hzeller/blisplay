@@ -1,0 +1,4 @@
+*.gcode
+fab/
+*.hex
+*.elf
