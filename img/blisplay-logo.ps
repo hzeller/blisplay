@@ -1,0 +1,33 @@
+%!PS
+%%BoundingBox: 0 0 1000 350
+
+/size 300 def
+
+/blind-symbol {
+    5 dict begin
+    /r size 7 div def
+    /small-r r 3.5 div def
+    /offset r 2 div def
+    r 0 moveto
+    0 0 r 0 360 arc
+    gsave 1 1 0 setrgbcolor fill grestore
+    0.95 0.95 0 setrgbcolor stroke
+    0 0 0 setrgbcolor
+    30 120 360 {
+	dup
+	/dx exch cos offset mul def
+	/dy exch sin offset mul def
+	small-r dx add dy moveto
+	dx dy small-r 0 360 arc
+    } for
+    fill
+    end
+} def
+
+/Helvetica findfont size scalefont setfont
+
+0 70 translate
+0 0 moveto (blisplay) show
+size 0.885 mul size 0.75 mul translate blind-symbol
+
+showpage
