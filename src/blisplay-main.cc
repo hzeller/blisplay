@@ -37,13 +37,13 @@ struct Frame {
 
 // Lookup-table which bits control which actuator.
 static const uint8_t pixel2actuator_bits[Frame::WIDTH * Frame::HEIGHT] = {
-    1,  1,  1,  1,     // TODO: fill
-    1,  1,  1,  1,
-    1,  1,  1,  1,
+      20,  0, 28, 0,
+     22, 19, 26, 27,
+    21, 17, 25, 29,
 
-    16, 16, 16, 16,    // TODO: fill
-    16, 16, 16, 16,
-    16, 16, 16, 16,
+      11, 12,  5,  0,
+     13, 10,  4,  6,
+    14,  9,  1,  3,
 };
 
 void spi_init() {
