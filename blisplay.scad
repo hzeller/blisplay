@@ -38,7 +38,9 @@ yoke_width = max(center_w + 2*mag_thick+2*yoke_wall,
 yoke_len = mag_len + 2*yoke_wall + 2*yoke_space;
 
 poke_len=2;
-poke_angle=3;
+poke_off_angle=-3;
+poke_on_angle=0;
+
 fingerpad_thick=0.7;
 
 fulcrum_dia=2;
@@ -61,7 +63,7 @@ module finger_pad(d=dot_dist,x=dots_x,y=dots_y,thick=fingerpad_thick) {
 	     for (py=[0:y-1]) {
 		  first_half = py < y/2;
 		  x_offset = (py-1)*dot_dist/3 - dot_dist * (first_half ? 0 : 1);
-		  y_offset = first_half ? -0.3 : 0.3;
+		  y_offset = first_half ? 0.3 : -0.3;
 		  translate([px*d +d/2 + x_offset,
 			     py*d + d/2 + y_offset,
 			     -thick/2])
@@ -98,9 +100,8 @@ module coil(poke_pos=0, is_poke) {
      //echo(poke_pos, " -> ", is_poke);
      poke_width=0.8;
      translate([0, fulcrum_distance-0.5, coil_height/2])
-     rotate([is_poke ? -poke_angle : 0, 0, 0]) translate([0, -fulcrum_distance+0.5, -coil_height/2])
-	  render() difference() {
-	  color("yellow")
+     rotate([is_poke ? -poke_on_angle : -poke_off_angle, 0, 0]) translate([0, -fulcrum_distance+0.5, -coil_height/2])
+	  color("yellow") render() difference() {
 	       translate([0, (dot_dist-poke_width)/2, 0]) rotate([90, 0, 90])
 	       linear_extrude(height=coil_thick, center=true, convexity = 10)
 	       import (file = "coil-shape.dxf");
@@ -135,7 +136,7 @@ module coil_stack(poke_array) {
 }
 
 module actuators(poke_array) {
-     //translate([0, 0, coil_height+poke_len-fingerpad_thick+1.5]) finger_pad();
+     translate([0, 0, coil_height+poke_len-fingerpad_thick+0.5]) finger_pad();
 
      rotate([0,0,180]) coil_stack(poke_array=poke_array);
 
@@ -276,6 +277,9 @@ module assembly(poke_array=[]) {
      translate([0,0,mag_w]) {
 	  yoke_spacer();
 	  rotate([0,0,180]) yoke_spacer();
+	  // The axles, exposed when spacer removed.
+	  translate([-yoke_width/4, -fulcrum_distance, mag_w/2]) rotate([0, 90, 0]) cylinder(r=2/2, h=yoke_width/2);
+	  translate([-yoke_width/4, +fulcrum_distance, mag_w/2]) rotate([0, 90, 0]) cylinder(r=2/2, h=yoke_width/2);
      }
      magnet_assembly();
      driver_board_assembly(true);
@@ -284,4 +288,6 @@ module assembly(poke_array=[]) {
      translate([-yoke_width/2 - acrylic_t/2, 0, 0]) side_wall();
 }
 
-assembly();
+// Pixels that are currently up.
+poke_array = [for (i = [0:23]) true];
+assembly(poke_array);
