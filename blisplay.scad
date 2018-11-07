@@ -175,7 +175,7 @@ module driver_board(realistic=true) {
      rotate([0,0,90]) translate([-driver_board_offset, -driver_board_width/2, 0]) {
 	  if (realistic) {
 	       color("purple") translate([-70, 66.45, 0])
-		    import(file="blisplay-driver.stl");
+		    import(file="driver-pcb/blisplay-driver.stl");
 	  } else {
 	       cube([driver_board_len, driver_board_width, driver_board_thick]);
 	  }
