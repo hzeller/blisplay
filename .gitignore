@@ -2,3 +2,4 @@
 fab/
 *.hex
 *.elf
+*.o
