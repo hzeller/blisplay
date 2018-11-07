@@ -1,4 +1,4 @@
-$fn=32;
+$fn=60;
 e=0.01;
 
 acrylic_t = 3;   // Acrylic thickness for laser-cut parts
@@ -56,20 +56,27 @@ echo("Coil size: ", coil_height + poke_len, "x",
 echo("Mount hole distance: ",
      mount_holes_in_yoke_spacer[1] - mount_holes_in_yoke_spacer[0], "mm");
 
-module finger_pad(d=dot_dist,x=dots_x,y=dots_y,thick=fingerpad_thick) {
-     color([0.5, 0.5, 0.9, 0.5]) translate([-x*d/2, -y*d/2, 0]) difference() {
-	  translate([-1, -1, 0]) cube([x*d + 2, y*d + 2, thick]);
-	for (px=[0:x-1]) {
-	     for (py=[0:y-1]) {
-		  first_half = py < y/2;
-		  x_offset = (py-1)*dot_dist/3 - dot_dist * (first_half ? 0 : 1);
-		  y_offset = first_half ? 0.3 : -0.3;
-		  translate([px*d +d/2 + x_offset,
-			     py*d + d/2 + y_offset,
-			     -thick/2])
-		       scale([1, 1.6]) cylinder(r=dot_dia/2,h=2*thick);
-	     }
-	}
+module finger_holder(elevate=2.5, finger_diameter=20, finger_hug_height=6) {
+     fh=finger_hug_height;
+     fr=finger_diameter / 2;
+     actuator_space=1;   // Space above actuators, e.g. for dampening
+     translate([0,0,elevate]) difference() {
+	  hull() {  // Outer space.
+	       intersection() {
+		    translate([0, 0, fr-0.5]) scale([1, 1.6, 1]) sphere(r=fr+0.5);
+		    translate([0,0,fh/2]) cube([20, 32, fh], center=true);
+	       }
+	       translate([0,-8,fh/2]) cube([20, 16, fh], center=true);
+	       translate([0,0,-elevate+0.5]) cube([yoke_width, 32, 1], center=true);
+	  }
+	  hull() {  // Space to keep felt dampener
+	       translate([0, 0, -elevate+actuator_space]) cube([4*2+2, 35+2*e, e], center=true);
+	       translate([0, 0, -elevate-e]) cube([4*2+6, 35+2*e, e], center=true);
+	  }
+	  punch_height=fh+elevate;
+	  cube([4*2+1, 6*2+1, punch_height+2*e], center=true);
+	  translate([0, 0, fr-0.5]) scale([1, 1.6, 1]) sphere(r=fr);
+	  translate([0, 0, fr+0.5]) rotate([90, 0, 0]) cylinder(r=fr, h=20);
      }
 }
 
@@ -136,8 +143,6 @@ module coil_stack(poke_array) {
 }
 
 module actuators(poke_array) {
-     translate([0, 0, coil_height+poke_len-fingerpad_thick+0.5]) finger_pad();
-
      rotate([0,0,180]) coil_stack(poke_array=poke_array);
 
      // The back is rotated and turned, so easy if we just map flipped array
@@ -283,7 +288,7 @@ module assembly(poke_array=[]) {
      }
      magnet_assembly();
      driver_board_assembly(true);
-
+     translate([0, 0, coil_height]) color("red") finger_holder();
      translate([yoke_width/2 + acrylic_t/2, 0, 0]) side_wall();
      translate([-yoke_width/2 - acrylic_t/2, 0, 0]) side_wall();
 }
