@@ -219,7 +219,7 @@ This will generate the following files inside a `fab/` directory:
   * `lasercut_sidewall.dxf` the side-wall to elevate the assembly to have a
     free view below. These dimensions are super rough right now and will change
     once there is a lens-assembly on the camera.
-  * `finger_holder.stl` is a hollow shape keeping the finger in place over
+  * `finger_cradle.stl` is a hollow shape keeping the finger in place over
     the actuators. You might need to adapt parameters to your finger-diameter.
     (currently does not lock into the rest of the assembly, you might need
     some double-sided tape).

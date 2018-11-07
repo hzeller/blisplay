@@ -1,7 +1,7 @@
 ALL_TARGETS= fab/lasercut_sidewall.dxf \
              fab/print_yoke_spacers.stl \
              fab/print_yokes_magnetic_filament.stl \
-             fab/finger_holder.stl \
+             fab/finger_cradle.stl \
              fab/assembly_tool_spacer_holder.stl
 
 all : $(ALL_TARGETS)
