@@ -147,7 +147,7 @@ Lorentz right-hand rule.
   ![Animation of forces in magnetic field][img-anim-lorentz] |
 ![A stack of three coils with offset fingers][img-triplet-coil] |
 -----------------------------------------------|---------------------|
-Moving coil in magnetic field. Blue arrow: static magnetic field; Red: current; Green: force | A triplet of coils with offset dots, stacked.
+Moving coil in magnetic field. Red arrow: varying current; Blue: static magnetic field; Green: resulting force | A triplet of coils with offset dots, stacked.
 
 
 If we hinge two stacks right and left with the poky bits meeting at the center
@@ -156,13 +156,16 @@ we have a 6x4 pixel arrangement.
 ![Rendering showing view of actuators without magnets][img-render-no-magnets] |
   ![Closeup of pixels in prototype][img-photo-pixels]
 -----------------------------------------------|---------------------|
-View of all actuator blade coils.  | Closeup of pixels in prototype (here, only 22 pixels)
+View of all actuator blade coils. Hinged at opposite ends of the assembly, they allow 6x4 pixels in the center.  | Closeup of pixels in prototype (here, only 22 pixels)
 
 With each blade coil mounted, they can be individually controlled.
 
 ![Animation of pixels scanning and poking through finger-pad][img-anim-pixel-scan]
 
 ## Driving Circuit
+
+The coils need to be driven in the low hundreds of milliampere; for this simple
+transistor drivers are used (maybe in the future half-bridges ?).
 
 The driving circuit for the coils are currently two identical boards with
 a shift register and ULN2803 open collector driver chips. The two chained
@@ -173,7 +176,8 @@ client.
 
 The component choice was based on what I had lying around at home, but a
 future iteration of this board will be more compact, e.g. by using
-NCV7751 chips that contain 12 drivers and an SPI interface in one package.
+NCV7751 chips that contain 12 drivers and an SPI interface in one package
+(or maybe TLE94112 with half-bridges).
 
 ![Rendering of coil-driver board](./img/driver-board-rendering.png) |
     ![Image of soldered coil-driver board](./img/driver-board-real.jpg)
@@ -259,13 +263,25 @@ into there. Then insulation covered that with transformer lacquer.
 Future experiments certainly will attempt to make this less tedious, e.g.
 hot-bar flexible PCB on top of the board instead.
 
-![Placing wire in groove][coil-groove]| ![finished coils][coil-finished]
+The coil PCB has pokey-bits for all three positions; once the coil is ready to
+mount, remove the unused ones with a side-cutter.
+
+![The coil][coil-render] | ![Placing wire in groove][coil-groove]
 --------------------------------------|-----------------------------------|
-Placing a wire in groove              | finished coils
+The coil PCB. Unused pokey bits are to be clipped off. Note the different lengths to accommodate the finger curvature. | Placing a wire in groove prepared with scalpel to keep wiring as flat as possible.
+
+
+The wiring to the driver boards is currently via soldering, but that makes it
+a pain to assemble and hard to maintain.
+Thus future versions will use flat-flex connectors.
+
+![finished coils][coil-finished]      | ![Wiring coils to driver][coil-attached]
+--------------------------------------|-----------------------------------|
+Finished coils, ready to mount.       | Wiring of coils to driver board.
 
 ### Code
-The code is in the src/ sub-directory. Build with the makefile there, then
-flash using an Atmel programmer via avrdude (`make flash`).
+The code is in the [`src/`](./src) sub-directory. Build with the makefile
+there, then flash using an Atmel programmer via avrdude (`make flash`).
 
 # License
 Any PCBs and 3D printed parts are Open Source Hardware licensed
@@ -285,4 +301,6 @@ with `CC-BY-SA` license. Any code is licensed with the GPL v3.
 [Lorentz force]: https://en.wikipedia.org/wiki/Lorentz_force
 [oshpark-driver]: https://oshpark.com/shared_projects/nWsVpTrj
 [coil-groove]: ./img/solder-wire-in-groove.jpg
+[coil-render]: ./img/coil-rendering.png
 [coil-finished]: ./img/soldered-coils.jpg
+[coil-attached]: ./img/coil-connect.jpg
