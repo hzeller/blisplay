@@ -1,4 +1,4 @@
-$fn=60;
+$fn=90;
 e=0.01;
 
 acrylic_t = 3;   // Acrylic thickness for laser-cut parts
@@ -23,19 +23,20 @@ driver_board_thick=1.6;
 
 driver_board_space_needed = driver_board_width + 2 * driver_board_frame;
 
-coil_height=3*mag_w;
+space_between_magnets=mag_w;
+coil_height=2*mag_w + space_between_magnets;
 coil_thick=0.4;
 coil_short=0;  // leave space to move at end.. typically !needed b/c yoke_space
 
 top_yoke=true;
-yoke_wall=1.2*mag_w;   // Large enough to capture most field-lines.
-yoke_space=4;          // Space around magnets.
+yoke_wall=25.4/8;
+yoke_space=5;          // Space around magnets (should be calculated not set)
 yoke_transparency = 1;
 
 center_w=dots_x * dot_dist;
-yoke_width = max(center_w + 2*mag_thick+2*yoke_wall,
-		 driver_board_space_needed);
 yoke_len = mag_len + 2*yoke_wall + 2*yoke_space;
+
+yoke_width = center_w + 2*mag_thick+2*yoke_wall;
 
 poke_len=2;
 poke_off_angle=-3;
@@ -43,6 +44,7 @@ poke_on_angle=0;
 
 fingerpad_thick=0.7;
 
+// To be shared with the postscript.
 fulcrum_dia=2;
 fulcrum_ring=1;
 fulcrum_distance=(mag_len + yoke_wall)/2 + yoke_space;
@@ -51,7 +53,7 @@ mount_holes_in_yoke_spacer = [ -12, 12 ];
 
 optical_clearance = 30;   // Clearance at the bottom for the optical system
 
-echo("Coil size: ", coil_height + poke_len, "x",
+echo("Coil PCB size: ", coil_height + poke_len, "x",
      fulcrum_distance+fulcrum_dia+fulcrum_ring);
 echo("Mount hole distance: ",
      mount_holes_in_yoke_spacer[1] - mount_holes_in_yoke_spacer[0], "mm");
@@ -76,8 +78,8 @@ module finger_cradle(elevate=2.5, finger_diameter=20, finger_hug_height=6) {
 	  // Punch the space for the actuator pins to come through.
 	  punch_height=fh+elevate;
 	  punch_corner_r=2;
-	  punch_w = (4*2+1)/2 - punch_corner_r;
-	  punch_h = (6*2+1)/2 - punch_corner_r;
+	  punch_w = (dots_x*dot_dist+1)/2 - punch_corner_r;
+	  punch_h = (dots_y*dot_dist+1)/2 - punch_corner_r;
 	  // Make a rounded corner hole.
 	  translate([0, 0, -punch_height/2]) hull() {
 	       translate([punch_w, punch_h, 0]) cylinder(r=punch_corner_r, h=punch_height);
@@ -95,21 +97,14 @@ module magnet() {
      color("green") translate([0,-mag_len/2,0]) cube([mag_thick/2, mag_len, mag_w]);
 }
 
-module yoke(yoke_height=mag_w, border_thin=0, with_magnet=false, is_bottom=true) {
-     extra_bottom = is_bottom ? driver_board_thick : 0;
-     difference() {
-	  color([0.5, 0.5, 0.5, yoke_transparency])
-	       translate([0,0,yoke_height/2 - extra_bottom/2])
-	       cube([yoke_width-2*border_thin, yoke_len-2*border_thin, yoke_height + extra_bottom - e], center=true);
-	  translate([0,0,yoke_height/2]) cube([center_w + 2*mag_thick + 2*border_thin, mag_len+2*yoke_space + 2*border_thin, yoke_height + 2 * extra_bottom + e], center=true);
 
-	  if (is_bottom) {
-	       translate([0,0,-e]) driver_board_assembly(realistic=false);
+module yoke(with_magnet=false) {
+     translate([-mag_thick, 0, -coil_height/2]) {
+	  translate([-yoke_wall, -mag_len/2, 0]) cube([yoke_wall, mag_len, coil_height]);
+	  if (with_magnet) {
+	       translate([mag_thick/2, 0, 0]) magnet();
+	       translate([mag_thick/2, 0, coil_height]) rotate([0,180,0]) magnet();
 	  }
-     }
-     if (with_magnet) {
-	  translate([-(center_w+mag_thick)/2, 0, 0]) magnet();
-	  translate([+(center_w+mag_thick)/2, 0, 0]) magnet();
      }
 }
 
@@ -161,9 +156,12 @@ module actuators(poke_array) {
 }
 
 module magnet_assembly() {
-     yoke(with_magnet=true, is_bottom=true);
-     if (top_yoke) translate([0,0,coil_height-mag_w]) rotate([0,0,180]) yoke(with_magnet=true, is_bottom=false);
+     translate([-center_w/2, 0, coil_height/2]) yoke(with_magnet=true);
+     translate([center_w/2, 0, coil_height/2]) rotate([180,0,180]) yoke(with_magnet=true);
+}
 
+module fulcrum_axles() {
+     // Fulcrum axles.
      fulcrum_len=dots_x * dot_dist + 2*mag_thick;
      color("silver") translate([0, fulcrum_distance, coil_height/2])
 	  rotate([0,90,0]) translate([0,0,-fulcrum_len/2]) cylinder(r=fulcrum_dia/2, h=fulcrum_len);
@@ -187,36 +185,65 @@ module driver_board_assembly(realistic=true) {
      translate([0, -yoke_len/2, -driver_board_thick]) rotate([0,0,180]) driver_board(realistic);
 }
 
+module yoke_spacer_screw() {
+     round_edge_radius=fulcrum_dia/2 + 2;
+     color("#FFBB00") translate([center_w/2, 0, 0]) {
+	  // Distance holders
+	  translate([-center_w, -fulcrum_distance, coil_height/2-round_edge_radius]) rotate([0, 90, 0]) difference() {
+	       cylinder(r=round_edge_radius, h=center_w);
+	       translate([0, 0, -e]) cylinder(r=3.2/2, h=center_w+2*e);
+	  }
+	  translate([-center_w, fulcrum_distance, -coil_height/2+round_edge_radius]) rotate([0, 90, 0]) difference() {
+	       cylinder(r=round_edge_radius, h=center_w);
+	       translate([0, 0, -e]) cylinder(r=3.2/2, h=center_w+2*e);
+	  }
+     }
+}
+
 // TODO: this is a lot of empty space in the yoke-spacer, that we can fill
 // with electronics later.
 module yoke_spacer() {
-     do_tapping = true;  // otherwise overhang.
-     mount_dia=do_tapping ? 2.7 : 3.2;
-     wiggle_room = 0.25;
-     // Leave wiggle-room for magnet on one side, yoke on other
-     smaller_yoke_space=yoke_space-2*wiggle_room;
-     color("#FFBB00") translate([center_w/2, 0, 0]) {
+     round_edge_radius=fulcrum_dia/2 + 2;
+     yoke_outer_wall = (yoke_width - center_w)/2;
+     color("#FFBB00") translate([center_w/2,0,0]) {
 	  difference() {
-	       yoke_outer_wall = (yoke_width - center_w)/2;
-	       spacer_high = coil_height - 2*mag_w;
-	       translate([0, -yoke_len/2, 0]) cube([yoke_outer_wall, yoke_len, spacer_high]);
+	       union() {
+		    // center piece, probably later more hollow for electronics
+		    translate([mag_thick/2,0,0]) cube([mag_thick, mag_len, space_between_magnets], center=true);
 
-	       // Holes for the fulcrum. Not entirely punched through to the end
-	       translate([-e, fulcrum_distance, spacer_high/2]) rotate([0,90,0]) cylinder(r=fulcrum_dia/2+0.2, h=yoke_outer_wall-1);
-	       translate([-e, -fulcrum_distance, spacer_high/2]) rotate([0,90,0]) cylinder(r=fulcrum_dia/2+0.2, h=yoke_outer_wall-1);
+		    hull() {
+			 translate([0, mag_len/2, -coil_height/2]) cube([mag_thick+yoke_wall, e, coil_height]);
+			 translate([0, fulcrum_distance, coil_height/2-round_edge_radius]) rotate([0, 90, 0]) cylinder(r=round_edge_radius, h=mag_thick+yoke_wall);
+			 translate([0, fulcrum_distance, -coil_height/2+round_edge_radius]) rotate([0, 90, 0]) cylinder(r=round_edge_radius, h=mag_thick+yoke_wall);
+		    }
 
-	       // Tapping holes to mount.
-	       for (m = mount_holes_in_yoke_spacer) {
-		    translate([-yoke_width/2, m, (coil_height-2*mag_w)/2]) rotate([0,90,0]) cylinder(r=mount_dia/2, h=yoke_width);
-		    if (!do_tapping) { // then hole for nut
-			 translate([yoke_outer_wall-4, m, 0]) cube([3, 5.4, 30], center=true);
+		    hull() {
+			 translate([0, -mag_len/2, -coil_height/2]) cube([mag_thick+yoke_wall, e, coil_height]);
+			 translate([0, -fulcrum_distance, coil_height/2-round_edge_radius]) rotate([0, 90, 0]) cylinder(r=round_edge_radius, h=mag_thick+yoke_wall);
+			 translate([0, -fulcrum_distance, -coil_height/2+round_edge_radius]) rotate([0, 90, 0]) cylinder(r=round_edge_radius, h=mag_thick+yoke_wall);
 		    }
 	       }
-	  }
 
-	  // The spacers around the magnets
-	  translate([0, yoke_len/2 - yoke_wall - smaller_yoke_space - wiggle_room, -mag_w]) cube([mag_thick, smaller_yoke_space, coil_height]);
-	  translate([0, -yoke_len/2+yoke_wall + wiggle_room, -mag_w]) cube([mag_thick, smaller_yoke_space, coil_height]);
+	       // Holes for the fulcrum. Not entirely punched through to the end
+	       translate([-e, fulcrum_distance, 0]) rotate([0,90,0]) cylinder(r=fulcrum_dia/2+0.2, h=yoke_outer_wall-1);
+	       translate([-e, -fulcrum_distance, 0]) rotate([0,90,0]) cylinder(r=fulcrum_dia/2+0.2, h=yoke_outer_wall-1);
+
+	       // Screw for the distance holders
+	       translate([mag_thick+yoke_wall, -fulcrum_distance, coil_height/2-round_edge_radius]) rotate([0, -90, 0]) mount_screw(h=yoke_width);
+
+	       // Crude cut-out to have a smooth screw holder
+	       translate([mag_thick+yoke_wall-2+e, -fulcrum_distance-3, coil_height/2-round_edge_radius]) cube([4, 6, 6], center=true);
+	       translate([mag_thick+yoke_wall-2+e, -fulcrum_distance, coil_height/2-round_edge_radius+3]) cube([4, 6, 6], center=true);
+
+	       translate([mag_thick+yoke_wall-2+e, +fulcrum_distance+3, -coil_height/2+round_edge_radius]) cube([4, 6, 6], center=true);
+	       translate([mag_thick+yoke_wall-2+e, fulcrum_distance, -coil_height/2+round_edge_radius-3]) cube([4, 6, 6], center=true);
+
+	       translate([mag_thick+yoke_wall, +fulcrum_distance, -coil_height/2+round_edge_radius]) rotate([0, -90, 0]) mount_screw(h=yoke_width);
+
+	       // ... the bolts from the other end
+	       translate([-center_w-mag_thick-yoke_wall, -fulcrum_distance, -coil_height/2+round_edge_radius]) rotate([0, 90, 0]) mount_screw(h=yoke_width);
+	       translate([-center_w-mag_thick-yoke_wall, +fulcrum_distance, coil_height/2-round_edge_radius]) rotate([0, 90, 0]) mount_screw(h=yoke_width);
+	  }
      }
 }
 
@@ -241,7 +268,14 @@ module side_wall() {
 
 module print_yoke_spacers() {
      rotate([0, -90, 0]) yoke_spacer();
-     translate([15, 5, 0]) rotate([0, -90, 0]) yoke_spacer();
+     translate([15, 15, 0]) rotate([0, -90, 0]) yoke_spacer();
+
+     translate([-20, 0, center_w]) rotate([0, 90, 0]) {
+	  yoke_spacer_screw();
+     }
+     translate([-20, 0, center_w]) rotate([0, -90, 0]) {
+	  yoke_spacer_screw();
+     }
 }
 
 // Create a 2D projection of the side-wall to laser-cut.
@@ -274,33 +308,40 @@ module print_yokes_hollow() {
 // Tool to hold up spacer while assembling
 module assembly_tool_spacer_holder() {
      bottom_thick=1;
-     spacer_high = coil_height - 2*mag_w;
      yoke_outer_wall = (yoke_width - center_w)/2;
      difference() {
 	  hull() {
 	       translate([0,10,0]) cylinder(r=15, h=bottom_thick);
 	       translate([0,-10,0]) cylinder(r=15, h=bottom_thick);
-	       translate([0,0,yoke_outer_wall]) cube([spacer_high+2, mag_len-mag_w, 1], center=true);
+	       translate([0,0,yoke_outer_wall]) cube([space_between_magnets+2, mag_len-mag_w, 1], center=true);
 	  }
-	  translate([0,0,10+bottom_thick]) cube([spacer_high+0.2, 60, 20], center=true);
+	  translate([0,0,10+bottom_thick]) cube([space_between_magnets+0.2, 60, 20], center=true);
      }
 }
 
 // This is how it all looks.
 module assembly(poke_array=[]) {
      actuators(poke_array);
-     translate([0,0,mag_w]) {
-	  yoke_spacer();
-	  rotate([0,0,180]) yoke_spacer();
+     translate([0,0,coil_height/2]) {
+	  { yoke_spacer(); yoke_spacer_screw(); }
+	  rotate([0,0,180]) { yoke_spacer(); yoke_spacer_screw(); }
 	  // The axles, exposed when spacer removed.
-	  translate([-yoke_width/4, -fulcrum_distance, mag_w/2]) rotate([0, 90, 0]) cylinder(r=2/2, h=yoke_width/2);
-	  translate([-yoke_width/4, +fulcrum_distance, mag_w/2]) rotate([0, 90, 0]) cylinder(r=2/2, h=yoke_width/2);
+	  //translate([-yoke_width/4, -fulcrum_distance, mag_w/2]) rotate([0, 90, 0]) cylinder(r=2/2, h=yoke_width/2);
+	  //translate([-yoke_width/4, +fulcrum_distance, mag_w/2]) rotate([0, 90, 0]) cylinder(r=2/2, h=yoke_width/2);
      }
      magnet_assembly();
-     driver_board_assembly(true);
-     translate([0, 0, coil_height]) color("red") finger_cradle();
-     translate([yoke_width/2 + acrylic_t/2, 0, 0]) side_wall();
-     translate([-yoke_width/2 - acrylic_t/2, 0, 0]) side_wall();
+     fulcrum_axles();
+     translate([0, 0, coil_height]) color("red") render() finger_cradle();
+
+     //driver_board_assembly(true);
+     //translate([yoke_width/2 + acrylic_t/2, 0, 0]) side_wall();
+     //translate([-yoke_width/2 - acrylic_t/2, 0, 0]) side_wall();
+}
+
+module mount_screw(h=17) {
+     translate([0,0,-e]) cylinder(r=6/2, h=4);
+     cylinder(r=3.2/2, h=h);
+     translate([0, 0, h-3]) cylinder(r=7/2, h=20, $fn=6);
 }
 
 // Pixels that are currently up.
