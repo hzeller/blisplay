@@ -1,4 +1,4 @@
-$fn=90;
+$fn=120;
 e=0.01;
 
 acrylic_t = 3;   // Acrylic thickness for laser-cut parts
@@ -43,6 +43,8 @@ poke_off_angle=-3;
 poke_on_angle=0;
 
 fingerpad_thick=0.7;
+flex_width=1;
+stack_layer_count = (dots_y * dots_x) / 2;  // half on each side
 
 // To be shared with the postscript.
 fulcrum_dia=2;
@@ -113,7 +115,7 @@ module coil(poke_pos=0, is_poke) {
      poke_width=0.8;
      translate([0, fulcrum_distance-0.5, coil_height/2])
      rotate([is_poke ? -poke_on_angle : -poke_off_angle, 0, 0]) translate([0, -fulcrum_distance+0.5, -coil_height/2])
-	  color("yellow") render() difference() {
+	  color("#00ef00") render() difference() {
 	       translate([0, (dot_dist-poke_width)/2, 0]) rotate([90, 0, 90])
 	       linear_extrude(height=coil_thick, center=true, convexity = 10)
 	       import (file = "coil-shape.dxf");
@@ -319,6 +321,35 @@ module assembly_tool_spacer_holder() {
      }
 }
 
+module flex_loop(len=10, width=flex_width-0.1, thickness=0.15, tongue=3) {
+     radius = (len + thickness)/2;
+     tongue_stick=0.8;
+     translate([0, width/2, 0]) rotate([90, 0, 0]) {
+	  linear_extrude(height=tongue) translate([len-thickness/2-0.05, -tongue_stick, 0]) square([thickness, 3]);
+	  linear_extrude(height=width) translate([len/2, 0])
+	       union() {
+	         translate([-len/2-thickness/2, 0, 0]) square([thickness, 3]);
+	         translate([len/2-thickness/2, 0, 0]) square([thickness, 3]);
+		 translate([0, 0, 0]) difference() {  // The loop
+		      circle(r=radius);
+		      circle(r=radius - thickness);
+		      translate([-radius, 0, 0]) square([2*radius+e, 2*radius]);
+		 }
+	  }
+     }
+}
+
+module flex_connector(center_space=2) {
+     color("#ffbf00") translate([-center_w/2 - mag_thick, 0, 0]) {
+	  // We connect two coils with the right and left flex-loop.
+	  for (i = [0:stack_layer_count/2-e]) {
+	       translate([0, (i+0.5)*flex_width+center_space/2, 0]) flex_loop(len=mag_thick + (2*i+1) * dot_dist/3, tongue=(i+1.5)*flex_width);
+	       // Mirror
+	       scale([1, -1, 1]) translate([0, (i+0.5)*flex_width+center_space/2, 0]) flex_loop(len=mag_thick + (2*i+1) * dot_dist/3, tongue=(i+1.5)*flex_width);
+	  }
+     }
+}
+
 // This is how it all looks.
 module assembly(poke_array=[]) {
      actuators(poke_array);
@@ -333,7 +364,10 @@ module assembly(poke_array=[]) {
      fulcrum_axles();
      translate([0, 0, coil_height]) color("red") render() finger_cradle();
 
-     //driver_board_assembly(true);
+     // Wiring
+     translate([0, fulcrum_distance - flex_width*stack_layer_count/2, 0]) flex_connector();
+     translate([0, -fulcrum_distance + flex_width*stack_layer_count/2+3, 0]) flex_connector();
+
      //translate([yoke_width/2 + acrylic_t/2, 0, 0]) side_wall();
      //translate([-yoke_width/2 - acrylic_t/2, 0, 0]) side_wall();
 }
