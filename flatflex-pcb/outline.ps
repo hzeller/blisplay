@@ -1,13 +1,16 @@
 %!PS-Adobe
-%%BoundingBox: 40 40 100 250
+%%BoundingBox: 40 40 100 240
 
 /mm { 25.4 div 72 mul } def
 /in { 72 mul } def
+/Helvetica findfont 4 scalefont setfont
+/show-annotations true def   % don't keep while creating the dxf
 
 /pi 3.1415926536 def
 /magnet-thick 0.25 in def   % magnetiazation through this
 /magnet-width 0.25 in def
 /connect-len 3 mm def
+/center-clearance 1 mm def  % Space to be left free in the middle.
 
 /cut-distance 0.1 mm def
 /half-cut-distance cut-distance 2 div def
@@ -21,17 +24,37 @@
 
 /bottom-len connect-len magnet-width add def
 
-/small-radius pi magnet-thick mul def
-/large-radius pi magnet-thick dots-x dots-distance mul add mul def
+% Loop radius is determined from how far a half-circlular loop needs to reach
+/small-radius pi magnet-thick 0.333 dots-distance mul add mul def
+/large-radius pi magnet-thick dots-x 0.333 sub dots-distance mul add mul def
 
-% In this range, we need to bring half the connectors
-/connector-patch large-radius small-radius sub connectors 2 div div def
+/tongue-wide large-radius small-radius sub connectors 2 div 1 sub div def
 
 /cable-width connectors-with-common connector-pitch mul def
-/cable-long bottom-len large-radius add connector-patch add def
+/cable-long bottom-len large-radius add tongue-wide add def
 
 50 50 translate
-0 setlinewidth
+cut-distance 3 div setlinewidth
+
+% y len (text)
+/measure-annotate {
+    1 dict begin
+    show-annotations {
+	/msg exch def
+	gsave
+	0 setlinewidth
+	0 0 0.8 setrgbcolor
+	exch
+	-3 mm exch moveto
+	gsave 90 rotate 0.5 mm -1.5 mm rmoveto msg show grestore
+	2 mm 0 rlineto
+	0 exch rlineto
+	-2 mm 0 rlineto
+	stroke
+	grestore
+    } if
+    end
+} def
 
 /half-fan {
     0 0 moveto
@@ -40,13 +63,19 @@
 
     0 1 connectors 2 div 1 sub {
 	/i exch def
-	0 small-radius i connector-patch mul add half-cut-distance add rlineto
+	0 small-radius i tongue-wide mul add half-cut-distance add rlineto
 	currentpoint exch pop 0 exch lineto
-	0 connector-patch cut-distance sub rlineto
+	0 tongue-wide cut-distance sub rlineto
 	i 2 add connector-pitch mul half-cut-distance sub 0 rlineto
 	currentpoint pop bottom-len lineto cut-distance 0 rlineto
-    } for
+   } for
 } def
+
+% Some measurements
+0 connect-len (con) measure-annotate
+connect-len magnet-width (magnet) measure-annotate
+bottom-len small-radius (first loop) measure-annotate
+bottom-len small-radius add large-radius small-radius sub (up last loop) measure-annotate
 
 half-fan stroke
 gsave
