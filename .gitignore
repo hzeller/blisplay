@@ -3,3 +3,8 @@ fab/
 *.hex
 *.elf
 *.o
+*.bak
+*.kicad_pcb-bak
+*-fab.kicad_pcb
+*-fab.zip
+fp-info-cache
