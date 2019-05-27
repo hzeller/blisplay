@@ -1,3 +1,0 @@
-(fp_lib_table
-	(lib (name Blisplay)(type KiCad)(uri ${KIPRJMOD}/blisplay.pretty)(options "")(descr ""))
-)

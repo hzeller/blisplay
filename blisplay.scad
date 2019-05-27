@@ -121,7 +121,7 @@ module coil(poke_pos=0, is_poke) {
 	  color("yellow") render() difference() {
 	       translate([0, (dot_dist-poke_width)/2, 0]) rotate([90, 0, 90])
 	       linear_extrude(height=coil_thick, center=true, convexity = 10)
-	       import (file = "coil-shape.dxf");
+	       import (file = "pcb/coil/coil-edge-cuts.dxf");
 	  // Remove the fingers that we're not interested in.
 	  for (i = [0:3]) {
 	       if (i != poke_pos) {

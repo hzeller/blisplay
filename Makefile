@@ -9,10 +9,7 @@ all : $(ALL_TARGETS)
 %.dxf: %.ps
 	pstoedit -psarg "-r600x600" -nb -mergetext -dt -f "dxf_s:-mm -ctl -splineaspolyline -splineprecision 30" $< $@
 
-%.png : %.ps
-	../scripts/ps2pnm 240 $< | pnmscale 0.25 | pnmtopng > $@
-
-fab/%.scad : blisplay.scad coil-shape.dxf
+fab/%.scad : blisplay.scad pcb/coil/coil-edge-cuts.dxf
 	mkdir -p fab/
 	echo 'use <blisplay.scad>\n$*();' > $@
 
