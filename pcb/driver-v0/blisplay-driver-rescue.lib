@@ -1,11 +1,11 @@
 EESchema-LIBRARY Version 2.4
 #encoding utf-8
 #
-# blisplay-driver-rescue_74HC595-Logic_74xx
+# 74HC595-Logic_74xx
 #
-DEF blisplay-driver-rescue_74HC595-Logic_74xx U 0 40 Y Y 1 L N
+DEF 74HC595-Logic_74xx U 0 40 Y Y 1 L N
 F0 "U" -300 550 50 H V C CNN
-F1 "blisplay-driver-rescue_74HC595-Logic_74xx" -300 -650 50 H V C CNN
+F1 "74HC595-Logic_74xx" -300 -650 50 H V C CNN
 F2 "" 0 0 50 H I C CNN
 F3 "" 0 0 50 H I C CNN
 $FPLIST
@@ -32,11 +32,11 @@ X ~QH 9 500 -500 200 L 50 50 1 0 O
 ENDDRAW
 ENDDEF
 #
-# blisplay-driver-rescue_C-device
+# C-device
 #
-DEF blisplay-driver-rescue_C-device C 0 10 N Y 1 F N
+DEF C-device C 0 10 N Y 1 F N
 F0 "C" 25 100 50 H V L CNN
-F1 "blisplay-driver-rescue_C-device" 25 -100 50 H V L CNN
+F1 "C-device" 25 -100 50 H V L CNN
 F2 "" 38 -150 50 H I C CNN
 F3 "" 0 0 50 H I C CNN
 $FPLIST
@@ -50,11 +50,11 @@ X ~ 2 0 -150 110 U 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #
-# blisplay-driver-rescue_Conn_01x01-Connector
+# Conn_01x01-Connector
 #
-DEF blisplay-driver-rescue_Conn_01x01-Connector J 0 40 Y N 1 F N
+DEF Conn_01x01-Connector J 0 40 Y N 1 F N
 F0 "J" 0 100 50 H V C CNN
-F1 "blisplay-driver-rescue_Conn_01x01-Connector" 0 -100 50 H V C CNN
+F1 "Conn_01x01-Connector" 0 -100 50 H V C CNN
 F2 "" 0 0 50 H I C CNN
 F3 "" 0 0 50 H I C CNN
 $FPLIST
@@ -72,11 +72,11 @@ X Pin_1 1 -200 0 150 R 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #
-# blisplay-driver-rescue_Conn_01x03-Connector
+# Conn_01x03-Connector
 #
-DEF blisplay-driver-rescue_Conn_01x03-Connector J 0 40 Y N 1 F N
+DEF Conn_01x03-Connector J 0 40 Y N 1 F N
 F0 "J" 0 200 50 H V C CNN
-F1 "blisplay-driver-rescue_Conn_01x03-Connector" 0 -200 50 H V C CNN
+F1 "Conn_01x03-Connector" 0 -200 50 H V C CNN
 F2 "" 0 0 50 H I C CNN
 F3 "" 0 0 50 H I C CNN
 $FPLIST
@@ -98,11 +98,11 @@ X Pin_3 3 -200 -100 150 R 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #
-# blisplay-driver-rescue_Conn_01x06-Connector
+# Conn_01x06-Connector
 #
-DEF blisplay-driver-rescue_Conn_01x06-Connector J 0 40 Y N 1 F N
+DEF Conn_01x06-Connector J 0 40 Y N 1 F N
 F0 "J" 0 300 50 H V C CNN
-F1 "blisplay-driver-rescue_Conn_01x06-Connector" 0 -400 50 H V C CNN
+F1 "Conn_01x06-Connector" 0 -400 50 H V C CNN
 F2 "" 0 0 50 H I C CNN
 F3 "" 0 0 50 H I C CNN
 $FPLIST
@@ -130,11 +130,11 @@ X Pin_6 6 -200 -300 150 R 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #
-# blisplay-driver-rescue_LED-device
+# LED-device
 #
-DEF blisplay-driver-rescue_LED-device D 0 40 Y N 1 F N
+DEF LED-device D 0 40 Y N 1 F N
 F0 "D" 0 100 50 H V C CNN
-F1 "blisplay-driver-rescue_LED-device" 0 -100 50 H V C CNN
+F1 "LED-device" 0 -100 50 H V C CNN
 F2 "" 0 0 50 H I C CNN
 F3 "" 0 0 50 H I C CNN
 $FPLIST
@@ -151,11 +151,11 @@ X A 2 150 0 100 L 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #
-# blisplay-driver-rescue_R-device
+# R-device
 #
-DEF blisplay-driver-rescue_R-device R 0 0 N Y 1 F N
+DEF R-device R 0 0 N Y 1 F N
 F0 "R" 80 0 50 V V C CNN
-F1 "blisplay-driver-rescue_R-device" 0 0 50 V V C CNN
+F1 "R-device" 0 0 50 V V C CNN
 F2 "" -70 0 50 V I C CNN
 F3 "" 0 0 50 H I C CNN
 $FPLIST
@@ -169,11 +169,11 @@ X ~ 2 0 -150 50 U 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #
-# blisplay-driver-rescue_ULN2803A-interface
+# ULN2803A-interface
 #
-DEF blisplay-driver-rescue_ULN2803A-interface U 0 40 Y Y 1 F N
+DEF ULN2803A-interface U 0 40 Y Y 1 F N
 F0 "U" 0 525 50 H V C CNN
-F1 "blisplay-driver-rescue_ULN2803A-interface" 0 450 50 H V C CNN
+F1 "ULN2803A-interface" 0 450 50 H V C CNN
 F2 "" 50 -650 50 H I L CNN
 F3 "" 100 -100 50 H I C CNN
 $FPLIST
@@ -211,34 +211,6 @@ X I6 6 -400 -200 100 R 50 50 1 1 I
 X I7 7 -400 -300 100 R 50 50 1 1 I
 X I8 8 -400 -400 100 R 50 50 1 1 I
 X GND 9 0 -700 100 U 50 50 1 1 W
-ENDDRAW
-ENDDEF
-#
-# power_+5V
-#
-DEF power_+5V #PWR 0 0 Y Y 1 F P
-F0 "#PWR" 0 -150 50 H I C CNN
-F1 "power_+5V" 0 140 50 H V C CNN
-F2 "" 0 0 50 H I C CNN
-F3 "" 0 0 50 H I C CNN
-DRAW
-P 2 0 1 0 -30 50 0 100 N
-P 2 0 1 0 0 0 0 100 N
-P 2 0 1 0 0 100 30 50 N
-X +5V 1 0 0 0 U 50 50 1 1 W N
-ENDDRAW
-ENDDEF
-#
-# power_GND
-#
-DEF power_GND #PWR 0 0 Y Y 1 F P
-F0 "#PWR" 0 -250 50 H I C CNN
-F1 "power_GND" 0 -150 50 H V C CNN
-F2 "" 0 0 50 H I C CNN
-F3 "" 0 0 50 H I C CNN
-DRAW
-P 6 0 1 0 0 0 0 -50 50 -50 0 -100 -50 -50 0 -50 N
-X GND 1 0 0 0 D 50 50 1 1 W N
 ENDDRAW
 ENDDEF
 #

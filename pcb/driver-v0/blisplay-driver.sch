@@ -1,6 +1,6 @@
 EESchema Schematic File Version 4
-LIBS:blisplay-interface-cache
-EELAYER 28 0
+LIBS:blisplay-driver-cache
+EELAYER 29 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -15,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L interface:ULN2803A U21
+L blisplay-driver-rescue:ULN2803A-interface U21
 U 1 1 5BCA4A44
 P 4050 4750
 F 0 "U21" H 4050 5317 50  0000 C CNN
@@ -26,7 +26,7 @@ F 3 "http://www.ti.com/lit/ds/symlink/uln2803a.pdf" H 4150 4650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L interface:ULN2803A U11
+L blisplay-driver-rescue:ULN2803A-interface U11
 U 1 1 5BCA59BE
 P 4000 2550
 F 0 "U11" H 4000 3117 50  0000 C CNN
@@ -59,7 +59,7 @@ F 3 "" H 4050 5450 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Logic_74xx:74HC595 U2
+L blisplay-driver-rescue:74HC595-Logic_74xx U2
 U 1 1 5BCAB656
 P 2800 4850
 F 0 "U2" V 2850 5050 50  0000 C CNN
@@ -70,7 +70,7 @@ F 3 "http://www.nxp.com/documents/data_sheet/74HC_HCT595.pdf" H 2800 4850 50  00
 	1    0    0    -1  
 $EndComp
 $Comp
-L Logic_74xx:74HC595 U1
+L blisplay-driver-rescue:74HC595-Logic_74xx U1
 U 1 1 5BCABF0D
 P 2750 2650
 F 0 "U1" V 2800 2850 50  0000 C CNN
@@ -153,7 +153,7 @@ F 3 "" H 1600 4050 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Connector:Conn_01x06 J1
+L blisplay-driver-rescue:Conn_01x06-Connector J1
 U 1 1 5BCBBB09
 P 1250 3750
 F 0 "J1" H 1168 3225 50  0000 C CNN
@@ -217,7 +217,7 @@ Wire Wire Line
 Text Label 3250 3250 0    50   ~ 0
 carry
 $Comp
-L device:C C1
+L blisplay-driver-rescue:C-device C1
 U 1 1 5BCF7DDB
 P 6300 2800
 F 0 "C1" H 6350 2900 50  0000 L CNN
@@ -263,7 +263,7 @@ $EndComp
 Wire Wire Line
 	2300 5050 2300 5100
 $Comp
-L device:C C2
+L blisplay-driver-rescue:C-device C2
 U 1 1 5BD64E2D
 P 6050 2800
 F 0 "C2" H 6100 2900 50  0000 L CNN
@@ -324,7 +324,7 @@ Wire Wire Line
 Wire Wire Line
 	1450 4050 1600 4050
 $Comp
-L Connector:Conn_01x03 J2
+L blisplay-driver-rescue:Conn_01x03-Connector J2
 U 1 1 5BCCEB4F
 P 5450 4950
 F 0 "J2" H 5530 4992 50  0000 L CNN
@@ -335,7 +335,7 @@ F 3 "~" H 5450 4950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Connector:Conn_01x03 J3
+L blisplay-driver-rescue:Conn_01x03-Connector J3
 U 1 1 5BCD02A1
 P 5450 4350
 F 0 "J3" H 5530 4392 50  0000 L CNN
@@ -346,7 +346,7 @@ F 3 "~" H 5450 4350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Connector:Conn_01x03 J4
+L blisplay-driver-rescue:Conn_01x03-Connector J4
 U 1 1 5BCD08F2
 P 5350 3200
 F 0 "J4" H 5430 3242 50  0000 L CNN
@@ -357,7 +357,7 @@ F 3 "~" H 5350 3200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Connector:Conn_01x03 J5
+L blisplay-driver-rescue:Conn_01x03-Connector J5
 U 1 1 5BCD15D5
 P 5350 2750
 F 0 "J5" H 5268 2425 50  0000 C CNN
@@ -368,7 +368,7 @@ F 3 "~" H 5350 2750 50  0001 C CNN
 	1    0    0    1   
 $EndComp
 $Comp
-L Connector:Conn_01x03 J6
+L blisplay-driver-rescue:Conn_01x03-Connector J6
 U 1 1 5BCD1FA6
 P 5350 2350
 F 0 "J6" H 5268 2025 50  0000 C CNN
@@ -460,7 +460,7 @@ Wire Wire Line
 Wire Wire Line
 	4650 3100 5150 3100
 $Comp
-L device:LED D1
+L blisplay-driver-rescue:LED-device D1
 U 1 1 5BD39E39
 P 3500 1950
 F 0 "D1" H 3493 1695 50  0000 C CNN
@@ -471,7 +471,7 @@ F 3 "~" H 3500 1950 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L device:R R1
+L blisplay-driver-rescue:R-device R1
 U 1 1 5BD3C356
 P 3250 2100
 F 0 "R1" H 3180 2054 50  0000 R CNN
@@ -497,7 +497,7 @@ $EndComp
 Wire Wire Line
 	3650 1950 3650 2000
 $Comp
-L Connector:Conn_01x01 J7
+L blisplay-driver-rescue:Conn_01x01-Connector J7
 U 1 1 5BD4C259
 P 6050 3600
 F 0 "J7" H 6130 3642 50  0000 L CNN
@@ -519,7 +519,7 @@ F 3 "" H 5850 3600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Connector:Conn_01x01 J8
+L blisplay-driver-rescue:Conn_01x01-Connector J8
 U 1 1 5BD5496C
 P 6050 3900
 F 0 "J8" H 6130 3942 50  0000 L CNN
