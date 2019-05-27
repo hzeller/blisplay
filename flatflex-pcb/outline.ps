@@ -1,40 +1,47 @@
 %!PS-Adobe
-%%BoundingBox: 40 40 100 240
+%%BoundingBox: 30 40 100 200
 
 /mm { 25.4 div 72 mul } def
 /in { 72 mul } def
 /Helvetica findfont 4 scalefont setfont
 /show-annotations true def   % don't keep while creating the dxf
 
+/solder-flap-len 4 mm def
+/solder-flap-arc 1 mm def
+/connector-extra-width 0 def  % width of the cable at the bottom
+/connect-len 4 mm def         % space for the solder connect at the bottom.
+
 /pi 3.1415926536 def
 /magnet-thick 0.25 in def   % magnetiazation through this
 /magnet-width 0.25 in def
-/connect-len 3 mm def
-/center-clearance 1 mm def  % Space to be left free in the middle.
 
-/cut-distance 0.1 mm def
+
+/cut-distance 0.3 mm def
 /half-cut-distance cut-distance 2 div def
 
-/dots-x 4 def
-/dots-distance 2 mm def
-/connectors dots-x 3 mul def
-/connectors-with-common connectors 2 add def
+/blades 6 def
+/blade-distance 2 mm 3 div def  % three blades make one cluster
 
-/connector-pitch 1 mm def
+/connectors blades def
+/connectors-with-common connectors 0 add def
+
+/connector-pitch 2 mm def
 
 /bottom-len connect-len magnet-width add def
 
 % Loop radius is determined from how far a half-circlular loop needs to reach
-/small-radius pi magnet-thick 0.333 dots-distance mul add mul def
-/large-radius pi magnet-thick dots-x 0.333 sub dots-distance mul add mul def
+/coil-movement 1 mm def
+/small-radius magnet-thick pi mul coil-movement add def
+/large-radius magnet-thick blade-distance blades 2 div mul add pi mul coil-movement add def
 
-/tongue-wide large-radius small-radius sub connectors 2 div 1 sub div def
+/step-distance large-radius small-radius sub connectors 2 div 1 sub div def
+/tongue-wide step-distance def
 
-/cable-width connectors-with-common connector-pitch mul def
+/cable-width connectors connector-pitch mul connector-extra-width add def
 /cable-long bottom-len large-radius add tongue-wide add def
 
 50 50 translate
-cut-distance 3 div setlinewidth
+cut-distance 4 div 0.1 mm min setlinewidth
 
 % y len (text)
 /measure-annotate {
@@ -45,7 +52,7 @@ cut-distance 3 div setlinewidth
 	0 setlinewidth
 	0 0 0.8 setrgbcolor
 	exch
-	-3 mm exch moveto
+	-6 mm exch moveto
 	gsave 90 rotate 0.5 mm -1.5 mm rmoveto msg show grestore
 	2 mm 0 rlineto
 	0 exch rlineto
@@ -59,15 +66,35 @@ cut-distance 3 div setlinewidth
 /half-fan {
     0 0 moveto
     0 bottom-len half-cut-distance sub lineto  % shoulder, beginning of cut.
-    connector-pitch half-cut-distance add 0 rlineto
+    cable-width connector-pitch connectors mul sub 2 div
+    half-cut-distance add 0 rlineto
 
     0 1 connectors 2 div 1 sub {
 	/i exch def
-	0 small-radius i tongue-wide mul add half-cut-distance add rlineto
-	currentpoint exch pop 0 exch lineto
-	0 tongue-wide cut-distance sub rlineto
-	i 2 add connector-pitch mul half-cut-distance sub 0 rlineto
-	currentpoint pop bottom-len lineto cut-distance 0 rlineto
+	0 step-distance i mul small-radius add half-cut-distance add
+	solder-flap-arc sub rlineto
+
+	currentpoint solder-flap-arc add   % arc outwards
+	currentpoint exch solder-flap-len sub exch
+	solder-flap-arc add solder-flap-arc arcto
+	solder-flap-len solder-flap-arc sub neg 0 rlineto  % remaining
+
+	0 tongue-wide cut-distance sub rlineto     % up the tongue
+
+	% Back, but not yet
+	solder-flap-len connector-pitch add cut-distance sub
+	solder-flap-arc sub
+	0 rlineto
+
+	currentpoint exch solder-flap-arc add exch
+	currentpoint exch solder-flap-arc add exch solder-flap-arc sub
+	solder-flap-arc
+	arcto
+
+	%i 1 add connector-pitch mul half-cut-distance sub 0 rlineto
+	%connector-pitch cut-distance sub 0 rlineto
+	currentpoint pop bottom-len lineto
+	cut-distance 0 rlineto
    } for
 } def
 
@@ -78,10 +105,13 @@ bottom-len small-radius (first loop) measure-annotate
 bottom-len small-radius add large-radius small-radius sub (up last loop) measure-annotate
 
 half-fan stroke
+
 gsave
-connectors-with-common connector-pitch mul 0 translate
+cable-width 0 translate
 -1 1 scale
 half-fan stroke
 grestore
-0 0 moveto connectors-with-common connector-pitch mul 0 lineto stroke
+
+0 0 moveto
+cable-width 0 lineto stroke
 showpage
