@@ -1,0 +1,502 @@
+EESchema Schematic File Version 4
+EELAYER 29 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L blisplay:NCV7751 U1
+U 1 1 5D0A18AC
+P 4550 3250
+F 0 "U1" H 4550 3350 50  0000 C CNN
+F 1 "NCV7751" H 4550 3450 50  0000 C CNN
+F 2 "blisplay:SSOP-24EP_3.9x8.7mm_P0.635mm" H 4550 3250 50  0001 C CNN
+F 3 "" H 4550 3250 50  0001 C CNN
+	1    4550 3250
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x12 J2
+U 1 1 5D0A2CDD
+P 6550 2200
+F 0 "J2" V 6550 1450 50  0000 C CNN
+F 1 "Flex" V 6550 2150 50  0000 C CNN
+F 2 "blisplay:flex-12" H 6550 2200 50  0001 C CNN
+F 3 "~" H 6550 2200 50  0001 C CNN
+	1    6550 2200
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x04 J1
+U 1 1 5D0A843B
+P 3050 2700
+F 0 "J1" H 2968 2275 50  0000 C CNN
+F 1 "Conn_01x04" H 2968 2366 50  0000 C CNN
+F 2 "" H 3050 2700 50  0001 C CNN
+F 3 "~" H 3050 2700 50  0001 C CNN
+	1    3050 2700
+	-1   0    0    1   
+$EndComp
+$Comp
+L power:VDD #PWR02
+U 1 1 5D0AB367
+P 3250 2700
+F 0 "#PWR02" H 3250 2550 50  0001 C CNN
+F 1 "VDD" V 3267 2828 50  0000 L CNN
+F 2 "" H 3250 2700 50  0001 C CNN
+F 3 "" H 3250 2700 50  0001 C CNN
+	1    3250 2700
+	0    1    1    0   
+$EndComp
+$Comp
+L power:GND #PWR03
+U 1 1 5D0AC0D6
+P 3250 2800
+F 0 "#PWR03" H 3250 2550 50  0001 C CNN
+F 1 "GND" H 3255 2627 50  0000 C CNN
+F 2 "" H 3250 2800 50  0001 C CNN
+F 3 "" H 3250 2800 50  0001 C CNN
+	1    3250 2800
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR05
+U 1 1 5D0AC94E
+P 4550 4100
+F 0 "#PWR05" H 4550 3850 50  0001 C CNN
+F 1 "GND" H 4555 3927 50  0000 C CNN
+F 2 "" H 4550 4100 50  0001 C CNN
+F 3 "" H 4550 4100 50  0001 C CNN
+	1    4550 4100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4400 4000 4500 4000
+Wire Wire Line
+	4500 4000 4550 4000
+Connection ~ 4500 4000
+Wire Wire Line
+	4600 4000 4700 4000
+Connection ~ 4600 4000
+Wire Wire Line
+	4550 4000 4550 4100
+Connection ~ 4550 4000
+Wire Wire Line
+	4550 4000 4600 4000
+$Comp
+L power:VDDA #PWR01
+U 1 1 5D0AD283
+P 3250 2600
+F 0 "#PWR01" H 3250 2450 50  0001 C CNN
+F 1 "VDDA" V 3267 2728 50  0000 L CNN
+F 2 "" H 3250 2600 50  0001 C CNN
+F 3 "" H 3250 2600 50  0001 C CNN
+	1    3250 2600
+	0    1    1    0   
+$EndComp
+Text Label 3350 2500 0    50   ~ 0
+VCOIL
+Wire Wire Line
+	3250 2500 3350 2500
+$Comp
+L power:VDDA #PWR06
+U 1 1 5D0AE036
+P 4700 2550
+F 0 "#PWR06" H 4700 2400 50  0001 C CNN
+F 1 "VDDA" H 4717 2723 50  0000 C CNN
+F 2 "" H 4700 2550 50  0001 C CNN
+F 3 "" H 4700 2550 50  0001 C CNN
+	1    4700 2550
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:VDD #PWR04
+U 1 1 5D0AEF17
+P 4400 2550
+F 0 "#PWR04" H 4400 2400 50  0001 C CNN
+F 1 "VDD" H 4417 2723 50  0000 C CNN
+F 2 "" H 4400 2550 50  0001 C CNN
+F 3 "" H 4400 2550 50  0001 C CNN
+	1    4400 2550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5150 2700 6050 2700
+Wire Wire Line
+	6050 2700 6050 2400
+Wire Wire Line
+	5150 2800 6250 2800
+Wire Wire Line
+	6250 2800 6250 2400
+Text Label 7300 3250 0    50   ~ 0
+VCOIL
+Wire Wire Line
+	5150 2900 6450 2900
+Wire Wire Line
+	6450 2900 6450 2400
+Wire Wire Line
+	5150 3000 6750 3000
+Wire Wire Line
+	6750 3000 6750 2400
+Wire Wire Line
+	5150 3100 6950 3100
+Wire Wire Line
+	6950 3100 6950 2400
+Wire Wire Line
+	5150 3200 7150 3200
+Wire Wire Line
+	7150 3200 7150 2400
+Wire Wire Line
+	5150 3800 6150 3800
+Wire Wire Line
+	6150 3800 6150 4250
+Wire Wire Line
+	5150 3700 6350 3700
+Wire Wire Line
+	6350 3700 6350 4250
+Wire Wire Line
+	5150 3600 6550 3600
+Wire Wire Line
+	6550 3600 6550 4250
+Wire Wire Line
+	5150 3500 6650 3500
+Wire Wire Line
+	6650 3500 6650 4250
+Wire Wire Line
+	5150 3400 6850 3400
+Wire Wire Line
+	6850 3400 6850 4250
+Wire Wire Line
+	5150 3300 7050 3300
+Wire Wire Line
+	7050 3300 7050 4250
+$Comp
+L Device:C C1
+U 1 1 5D0F39C4
+P 3950 4600
+F 0 "C1" H 4065 4646 50  0000 L CNN
+F 1 "10μ" H 4065 4555 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric" H 3988 4450 50  0001 C CNN
+F 3 "~" H 3950 4600 50  0001 C CNN
+	1    3950 4600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7300 2700 7300 3950
+$Comp
+L Device:C C3
+U 1 1 5D0F76B5
+P 4300 4600
+F 0 "C3" H 4415 4646 50  0000 L CNN
+F 1 "10μ" H 4415 4555 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric" H 4338 4450 50  0001 C CNN
+F 3 "~" H 4300 4600 50  0001 C CNN
+	1    4300 4600
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C5
+U 1 1 5D0F7B9C
+P 4650 4600
+F 0 "C5" H 4765 4646 50  0000 L CNN
+F 1 "10μ" H 4765 4555 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric" H 4688 4450 50  0001 C CNN
+F 3 "~" H 4650 4600 50  0001 C CNN
+	1    4650 4600
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C7
+U 1 1 5D0F8B85
+P 5000 4600
+F 0 "C7" H 5115 4646 50  0000 L CNN
+F 1 "10μ" H 5115 4555 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric" H 5038 4450 50  0001 C CNN
+F 3 "~" H 5000 4600 50  0001 C CNN
+	1    5000 4600
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C2
+U 1 1 5D1004A4
+P 3950 5150
+F 0 "C2" H 4065 5196 50  0000 L CNN
+F 1 "10μ" H 4065 5105 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric" H 3988 5000 50  0001 C CNN
+F 3 "~" H 3950 5150 50  0001 C CNN
+	1    3950 5150
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C4
+U 1 1 5D1004AA
+P 4300 5150
+F 0 "C4" H 4415 5196 50  0000 L CNN
+F 1 "10μ" H 4415 5105 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric" H 4338 5000 50  0001 C CNN
+F 3 "~" H 4300 5150 50  0001 C CNN
+	1    4300 5150
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C6
+U 1 1 5D1004B0
+P 4650 5150
+F 0 "C6" H 4765 5196 50  0000 L CNN
+F 1 "10μ" H 4765 5105 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric" H 4688 5000 50  0001 C CNN
+F 3 "~" H 4650 5150 50  0001 C CNN
+	1    4650 5150
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C8
+U 1 1 5D1004B6
+P 5000 5150
+F 0 "C8" H 5115 5196 50  0000 L CNN
+F 1 "10μ" H 5115 5105 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric" H 5038 5000 50  0001 C CNN
+F 3 "~" H 5000 5150 50  0001 C CNN
+	1    5000 5150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3950 5300 4300 5300
+Wire Wire Line
+	4300 5300 4650 5300
+Connection ~ 4300 5300
+Wire Wire Line
+	4650 5300 4800 5300
+Connection ~ 4650 5300
+$Comp
+L power:GND #PWR0101
+U 1 1 5D103296
+P 4800 5300
+F 0 "#PWR0101" H 4800 5050 50  0001 C CNN
+F 1 "GND" H 4805 5127 50  0000 C CNN
+F 2 "" H 4800 5300 50  0001 C CNN
+F 3 "" H 4800 5300 50  0001 C CNN
+	1    4800 5300
+	1    0    0    -1  
+$EndComp
+Connection ~ 4800 5300
+Wire Wire Line
+	4800 5300 5000 5300
+Wire Wire Line
+	3950 4750 4300 4750
+Wire Wire Line
+	4300 4750 4650 4750
+Connection ~ 4300 4750
+Wire Wire Line
+	4650 4750 4800 4750
+Connection ~ 4650 4750
+$Comp
+L power:GND #PWR0102
+U 1 1 5D10B79A
+P 4800 4750
+F 0 "#PWR0102" H 4800 4500 50  0001 C CNN
+F 1 "GND" H 4805 4577 50  0000 C CNN
+F 2 "" H 4800 4750 50  0001 C CNN
+F 3 "" H 4800 4750 50  0001 C CNN
+	1    4800 4750
+	1    0    0    -1  
+$EndComp
+Connection ~ 4800 4750
+Wire Wire Line
+	4800 4750 5000 4750
+Wire Wire Line
+	3950 4450 4300 4450
+Wire Wire Line
+	4300 4450 4650 4450
+Connection ~ 4300 4450
+Wire Wire Line
+	4650 4450 5000 4450
+Connection ~ 4650 4450
+Wire Wire Line
+	5000 5000 4650 5000
+Wire Wire Line
+	4650 5000 4300 5000
+Connection ~ 4650 5000
+Wire Wire Line
+	4300 5000 3950 5000
+Connection ~ 4300 5000
+Text Label 4000 4450 0    50   ~ 0
+VCOIL
+Text Label 4000 5000 0    50   ~ 0
+VCOIL
+$Comp
+L Connector_Generic:Conn_01x12 J4
+U 1 1 5D129E0C
+P 6550 1900
+F 0 "J4" V 6550 1150 50  0000 C CNN
+F 1 "Flex" V 6550 1850 50  0000 C CNN
+F 2 "blisplay:flex-12" H 6550 1900 50  0001 C CNN
+F 3 "~" H 6550 1900 50  0001 C CNN
+	1    6550 1900
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	6350 2400 6350 2100
+Wire Wire Line
+	6450 2400 6450 2100
+Connection ~ 6450 2400
+Wire Wire Line
+	6550 2400 6550 2100
+Wire Wire Line
+	6650 2400 6650 2100
+Wire Wire Line
+	6750 2400 6750 2100
+Connection ~ 6750 2400
+Wire Wire Line
+	6850 2400 6850 2100
+Wire Wire Line
+	6950 2100 6950 2400
+Connection ~ 6950 2400
+Wire Wire Line
+	7050 2100 7050 2400
+Wire Wire Line
+	7150 2100 7150 2400
+Connection ~ 7150 2400
+Wire Wire Line
+	6050 2100 6050 2400
+Connection ~ 6050 2400
+Wire Wire Line
+	6150 2400 6150 2100
+Wire Wire Line
+	6250 2400 6250 2100
+Connection ~ 6250 2400
+Connection ~ 6150 4250
+Connection ~ 6350 4250
+Connection ~ 6550 4250
+Connection ~ 6650 4250
+Connection ~ 6850 4250
+Connection ~ 7050 4250
+Wire Wire Line
+	6150 2700 6350 2700
+Wire Wire Line
+	6150 2400 6150 2700
+Connection ~ 6150 2400
+Wire Wire Line
+	6350 2400 6350 2700
+Connection ~ 6350 2400
+Connection ~ 6350 2700
+Wire Wire Line
+	6350 2700 6550 2700
+Wire Wire Line
+	6550 2400 6550 2700
+Connection ~ 6550 2400
+Connection ~ 6550 2700
+Wire Wire Line
+	6550 2700 6650 2700
+Wire Wire Line
+	6650 2400 6650 2700
+Connection ~ 6650 2400
+Connection ~ 6650 2700
+Wire Wire Line
+	6650 2700 6850 2700
+Wire Wire Line
+	6850 2400 6850 2700
+Connection ~ 6850 2400
+Connection ~ 6850 2700
+Wire Wire Line
+	6850 2700 7050 2700
+Wire Wire Line
+	7050 2400 7050 2700
+Connection ~ 7050 2400
+Connection ~ 7050 2700
+Wire Wire Line
+	7050 2700 7300 2700
+Wire Wire Line
+	6050 3950 6250 3950
+Wire Wire Line
+	6050 3950 6050 4250
+Connection ~ 6050 4250
+Wire Wire Line
+	6250 3950 6250 4250
+Connection ~ 6250 3950
+Wire Wire Line
+	6250 3950 6450 3950
+Connection ~ 6250 4250
+Wire Wire Line
+	6450 4250 6450 3950
+Connection ~ 6450 4250
+Connection ~ 6450 3950
+Wire Wire Line
+	6450 3950 6750 3950
+Wire Wire Line
+	6750 4250 6750 3950
+Connection ~ 6750 4250
+Connection ~ 6750 3950
+Wire Wire Line
+	6750 3950 6950 3950
+Wire Wire Line
+	6950 4250 6950 3950
+Connection ~ 6950 4250
+Connection ~ 6950 3950
+Wire Wire Line
+	6950 3950 7150 3950
+Wire Wire Line
+	7150 4250 7150 3950
+Connection ~ 7150 4250
+Connection ~ 7150 3950
+Wire Wire Line
+	7150 3950 7300 3950
+$Comp
+L Connector_Generic:Conn_01x12 J3
+U 1 1 5D0A5A26
+P 6650 4450
+F 0 "J3" V 6650 5100 50  0000 C CNN
+F 1 "Flex" V 6650 4400 50  0000 C CNN
+F 2 "blisplay:flex-12" H 6650 4450 50  0001 C CNN
+F 3 "~" H 6650 4450 50  0001 C CNN
+	1    6650 4450
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x12 J5
+U 1 1 5D144EA0
+P 6650 4750
+F 0 "J5" V 6650 5400 50  0000 C CNN
+F 1 "Flex" V 6650 4700 50  0000 C CNN
+F 2 "blisplay:flex-12" H 6650 4750 50  0001 C CNN
+F 3 "~" H 6650 4750 50  0001 C CNN
+	1    6650 4750
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	6050 4250 6050 4550
+Wire Wire Line
+	6150 4250 6150 4550
+Wire Wire Line
+	6250 4250 6250 4550
+Wire Wire Line
+	6350 4250 6350 4550
+Wire Wire Line
+	6450 4250 6450 4550
+Wire Wire Line
+	6550 4250 6550 4550
+Wire Wire Line
+	6650 4250 6650 4550
+Wire Wire Line
+	6750 4250 6750 4550
+Wire Wire Line
+	6850 4250 6850 4550
+Wire Wire Line
+	6950 4250 6950 4550
+Wire Wire Line
+	7050 4250 7050 4550
+Wire Wire Line
+	7150 4250 7150 4550
+Wire Wire Line
+	4300 4000 4400 4000
+Connection ~ 4400 4000
+$EndSCHEMATC
