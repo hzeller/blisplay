@@ -43,7 +43,7 @@ poke_off_angle=-3;
 poke_on_angle=0;
 
 fingerpad_thick=0.7;
-flex_width=1;
+flex_width=2;
 stack_layer_count = (dots_y * dots_x) / 2;  // half on each side
 
 // To be shared with the postscript.
@@ -89,8 +89,8 @@ module finger_cradle(elevate=2.5, finger_diameter=20, finger_hug_height=6) {
 	       translate([-punch_w, -punch_h, 0]) cylinder(r=punch_corner_r, h=punch_height);
 	       translate([punch_w, -punch_h, 0]) cylinder(r=punch_corner_r, h=punch_height);
 	  }
-	  translate([0, 0, fr-0.5]) scale([1, 1.6, 1]) sphere(r=fr);
-	  translate([0, 0, fr+0.5]) rotate([90, 0, 0]) cylinder(r=fr, h=20);
+	  translate([0, 0, fr-0.5]) scale([1, 1.2, 1]) sphere(r=fr);
+	  //translate([0, 0, fr+0.5]) rotate([90, 0, 0]) cylinder(r=fr, h=20);
      }
 }
 
@@ -323,9 +323,9 @@ module assembly_tool_spacer_holder() {
 
 module flex_loop(len=10, width=flex_width-0.1, thickness=0.15, tongue=3) {
      radius = (len + thickness)/2;
-     tongue_stick=0.8;
+     tongue_stick=0.0;
      translate([0, width/2, 0]) rotate([90, 0, 0]) {
-	  linear_extrude(height=tongue) translate([len-thickness/2-0.05, -tongue_stick, 0]) square([thickness, 3]);
+	  linear_extrude(height=tongue) translate([len-thickness/2, -tongue_stick, 0]) square([thickness, 3]);
 	  linear_extrude(height=width) translate([len/2, 0])
 	       union() {
 	         translate([-len/2-thickness/2, 0, 0]) square([thickness, 3]);
@@ -342,11 +342,22 @@ module flex_loop(len=10, width=flex_width-0.1, thickness=0.15, tongue=3) {
 module flex_connector(center_space=2) {
      color("#ffbf00") translate([-center_w/2 - mag_thick, 0, 0]) {
 	  // We connect two coils with the right and left flex-loop.
-	  for (i = [0:stack_layer_count/2-e]) {
-	       translate([0, (i+0.5)*flex_width+center_space/2, 0]) flex_loop(len=mag_thick + (2*i+1) * dot_dist/3, tongue=(i+1.5)*flex_width);
+	  lips = stack_layer_count/4;
+	  for (i = [0:lips-e]) {
+	       translate([0, -(lips-i)*flex_width+center_space/2, 0]) flex_loop(len=mag_thick + (2*i+1) * dot_dist/3);
 	       // Mirror
-	       scale([1, -1, 1]) translate([0, (i+0.5)*flex_width+center_space/2, 0]) flex_loop(len=mag_thick + (2*i+1) * dot_dist/3, tongue=(i+1.5)*flex_width);
+	       scale([1, -1, 1]) translate([0, -(lips-i)*flex_width+center_space/2, 0]) flex_loop(len=mag_thick + (2*i+1) * dot_dist/3);
 	  }
+     }
+}
+
+module flex_wiring() {
+     // Wiring
+     translate([0, fulcrum_distance - flex_width*stack_layer_count/2 - 4, 0]) flex_connector();
+     translate([0, -fulcrum_distance + flex_width*stack_layer_count/2 + 4, 0]) flex_connector();
+     rotate([0, 0, 180]) {
+	  translate([0, fulcrum_distance - flex_width*stack_layer_count/2 - 4, 0]) flex_connector();
+	  translate([0, -fulcrum_distance + flex_width*stack_layer_count/2 + 4, 0]) flex_connector();
      }
 }
 
@@ -363,11 +374,7 @@ module assembly(poke_array=[]) {
      magnet_assembly();
      fulcrum_axles();
      translate([0, 0, coil_height]) color("red") render() finger_cradle();
-
-     // Wiring
-     translate([0, fulcrum_distance - flex_width*stack_layer_count/2, 0]) flex_connector();
-     translate([0, -fulcrum_distance + flex_width*stack_layer_count/2+3, 0]) flex_connector();
-
+     flex_wiring();
      //translate([yoke_width/2 + acrylic_t/2, 0, 0]) side_wall();
      //translate([-yoke_width/2 - acrylic_t/2, 0, 0]) side_wall();
 }
