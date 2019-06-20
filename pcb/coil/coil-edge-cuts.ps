@@ -9,10 +9,11 @@
 /mag_w 0.25 in def
 /yoke_thick mag_w def
 /yoke_space 4 mm def
+/driver-board-height 9 mm def
 
 /bottom-corner-radius 1 mm def
 
-/coil-height mag_w 3 mul def
+/coil-height mag_w 2 mul driver-board-height add def
 /coil-length mag_len 2 div def
 
 % The poking pins are different lengths to better match

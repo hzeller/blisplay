@@ -15,15 +15,12 @@ mag_w=25.4/4;       // width of the poles we look at.
 mag_thick=25.4/4;   // Poles are on opposite ends of the thickness
 
 // Driver PCB.
-driver_board_width=36;
-driver_board_len=28;
-driver_board_frame = 1;  // Frame around driver board to hold it.
-driver_board_offset=15;  // first solder point that needs to be outside
-driver_board_thick=1.6;
+driver_board_width=38;
+driver_board_height=9;
+driver_board_thick=0.8;
+driver_flex_distance=21;
 
-driver_board_space_needed = driver_board_width + 2 * driver_board_frame;
-
-space_between_magnets=mag_w;
+space_between_magnets=driver_board_height;
 coil_height=2*mag_w + space_between_magnets;
 coil_thick=0.4;
 coil_short=0;  // leave space to move at end.. typically !needed b/c yoke_space
@@ -108,6 +105,7 @@ module yoke(with_magnet=false) {
 	       translate([mag_thick/2, 0, coil_height]) rotate([0,180,0]) magnet();
 	  }
      }
+     translate([-mag_thick, 0, 0]) driver_board();
 }
 
 module coil(poke_pos=0, is_poke) {
@@ -172,19 +170,9 @@ module fulcrum_axles() {
 }
 
 module driver_board(realistic=true) {
-     rotate([0,0,90]) translate([-driver_board_offset, -driver_board_width/2, 0]) {
-	  if (realistic) {
-	       color("purple") translate([-70, 66.45, 0])
-		    import(file="driver-pcb/blisplay-driver.stl");
-	  } else {
-	       cube([driver_board_len, driver_board_width, driver_board_thick]);
-	  }
+     color("lightgreen") {
+	  rotate([0, 90, 0]) rotate([0, 0, 90]) translate([-119, 54.5, 0]) import(file = "pcb/driver-oc/blisplay-driver-oc.stl");
      }
-}
-
-module driver_board_assembly(realistic=true) {
-     translate([0, yoke_len/2, -driver_board_thick]) driver_board(realistic);
-     translate([0, -yoke_len/2, -driver_board_thick]) rotate([0,0,180]) driver_board(realistic);
 }
 
 module yoke_spacer_screw() {
@@ -245,25 +233,6 @@ module yoke_spacer() {
 	       // ... the bolts from the other end
 	       translate([-center_w-mag_thick-yoke_wall, -fulcrum_distance, -coil_height/2+round_edge_radius]) rotate([0, 90, 0]) mount_screw(h=yoke_width);
 	       translate([-center_w-mag_thick-yoke_wall, +fulcrum_distance, coil_height/2-round_edge_radius]) rotate([0, 90, 0]) mount_screw(h=yoke_width);
-	  }
-     }
-}
-
-module side_wall() {
-     bottom_wide = yoke_len + 2*(driver_board_len - driver_board_offset);
-     bottom_radius=5;
-
-     difference() {
-	  color([0.5, 0.5, 0.5, 0.2]) hull() {
-	       translate([0, 0, coil_height/2]) cube([acrylic_t, yoke_len, coil_height], center=true);
-	       cube([acrylic_t, bottom_wide, e], center=true);
-
-	       translate([-acrylic_t/2, bottom_wide/2 - bottom_radius, -optical_clearance+bottom_radius]) rotate([0, 90, 0]) cylinder(r=bottom_radius, h=acrylic_t);
-	       translate([-acrylic_t/2, -bottom_wide/2 + bottom_radius, -optical_clearance+bottom_radius]) rotate([0, 90, 0]) cylinder(r=bottom_radius, h=acrylic_t);
-	  }
-
-	  for (m = mount_holes_in_yoke_spacer) {
-	       translate([-acrylic_t/2-e, m, (coil_height-2*mag_w)/2 + mag_w]) rotate([0,90,0]) cylinder(r=3.2/2, h=acrylic_t+2*e);
 	  }
      }
 }
@@ -352,12 +321,11 @@ module flex_connector(center_space=2) {
 }
 
 module flex_wiring() {
-     // Wiring
-     translate([0, fulcrum_distance - flex_width*stack_layer_count/2 - 4, 0]) flex_connector();
-     translate([0, -fulcrum_distance + flex_width*stack_layer_count/2 + 4, 0]) flex_connector();
+     translate([0, driver_flex_distance/2, 0]) flex_connector();
+     translate([0, -driver_flex_distance/2, 0]) flex_connector();
      rotate([0, 0, 180]) {
-	  translate([0, fulcrum_distance - flex_width*stack_layer_count/2 - 4, 0]) flex_connector();
-	  translate([0, -fulcrum_distance + flex_width*stack_layer_count/2 + 4, 0]) flex_connector();
+	  translate([0, driver_flex_distance/2, 0]) flex_connector();
+	  translate([0, -driver_flex_distance/2, 0]) flex_connector();
      }
 }
 
@@ -375,8 +343,6 @@ module assembly(poke_array=[]) {
      fulcrum_axles();
      translate([0, 0, coil_height]) color("red") render() finger_cradle();
      flex_wiring();
-     //translate([yoke_width/2 + acrylic_t/2, 0, 0]) side_wall();
-     //translate([-yoke_width/2 - acrylic_t/2, 0, 0]) side_wall();
 }
 
 module mount_screw(h=17) {
@@ -387,4 +353,16 @@ module mount_screw(h=17) {
 
 // Pixels that are currently up.
 poke_array = [for (i = [0:23]) true];
-assembly(poke_array);
+
+d = 3;
+if (d == 0) {
+     coil_stack();
+} else if (d == 1) {
+     yoke(with_magnet=true);
+} else if (d == 2) {
+     coil_stack();
+     magnet_assembly();
+     flex_wiring();
+} else {
+     assembly(poke_array);
+}
