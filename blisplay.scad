@@ -23,15 +23,11 @@ driver_flex_distance=21;
 space_between_magnets=driver_board_height;
 coil_height=2*mag_w + space_between_magnets;
 coil_thick=0.4;
-coil_short=0;  // leave space to move at end.. typically !needed b/c yoke_space
 
-top_yoke=true;
-yoke_wall=25.4/8;
-yoke_space=5;          // Space around magnets (should be calculated not set)
-yoke_transparency = 1;
+yoke_wall=25.4/8;      // thickness of yoke material.
+yoke_transparency = 0.5;
 
 center_w=dots_x * dot_dist;
-yoke_len = mag_len + 2*yoke_wall + 2*yoke_space;
 
 yoke_width = center_w + 2*mag_thick+2*yoke_wall;
 
@@ -39,23 +35,18 @@ poke_len=2;
 poke_off_angle=-3;
 poke_on_angle=0;
 
-fingerpad_thick=0.7;
 flex_width=2;
 stack_layer_count = (dots_y * dots_x) / 2;  // half on each side
 
 // To be shared with the postscript.
 fulcrum_dia=2;
 fulcrum_ring=1;
-fulcrum_distance=(mag_len + yoke_wall)/2 + yoke_space;
-
-mount_holes_in_yoke_spacer = [ -12, 12 ];
+fulcrum_distance=28;
 
 optical_clearance = 30;   // Clearance at the bottom for the optical system
 
 echo("Coil PCB size: ", coil_height + poke_len, "x",
      fulcrum_distance+fulcrum_dia+fulcrum_ring);
-echo("Mount hole distance: ",
-     mount_holes_in_yoke_spacer[1] - mount_holes_in_yoke_spacer[0], "mm");
 
 module finger_cradle(elevate=2.5, finger_diameter=20, finger_hug_height=6) {
      fh=finger_hug_height;
@@ -99,7 +90,9 @@ module magnet() {
 
 module yoke(with_magnet=false) {
      translate([-mag_thick, 0, -coil_height/2]) {
-	  translate([-yoke_wall, -mag_len/2, 0]) cube([yoke_wall, mag_len, coil_height]);
+	  color([0.5, 0.5, 0.5, yoke_transparency])
+	       translate([-yoke_wall, -mag_len/2, 0])
+	       cube([yoke_wall, mag_len, coil_height]);
 	  if (with_magnet) {
 	       translate([mag_thick/2, 0, 0]) magnet();
 	       translate([mag_thick/2, 0, coil_height]) rotate([0,180,0]) magnet();
@@ -249,33 +242,6 @@ module print_yoke_spacers() {
      }
 }
 
-// Create a 2D projection of the side-wall to laser-cut.
-module lasercut_sidewall() {
-     projection(cut = true) rotate([0, 90, 0]) side_wall();
-     projection(cut = true) translate([39, 0, 0]) rotate([0, -90, 0]) side_wall();
-}
-
-module print_yokes_magnetic_filament() {
-     translate([0,0,mag_w]) rotate([0,180,0]) yoke(with_magnet=false, is_bottom=true);
-     translate([yoke_width + 2, 0, 0]) yoke(with_magnet=false, is_bottom=false);
-}
-
-// In case the yoke is to be printed hollow to be filled with iron filings,
-// then a lid put on top.
-// Requires support and in general is a little messy.
-// Set slicer to 0% infill, no top-shell and support material.
-// Generate by explicitly calling
-//   make fab/print_yokes_hollow.stl
-module print_yokes_hollow() {
-     // Bottom with lid
-     translate([0,0,driver_board_thick]) yoke(with_magnet=false, is_bottom=true);
-     translate([0, yoke_len+2, 0]) yoke(yoke_height=0.4, border_thin=1, is_bottom=false);
-
-     // Top with lid
-     translate([yoke_width + 2, 0, 0]) yoke(with_magnet=false, is_bottom=false);
-     translate([yoke_width + 2, yoke_len + 2, 0]) yoke(yoke_height=0.4, border_thin=1, is_bottom=false);
-}
-
 // Tool to hold up spacer while assembling
 module assembly_tool_spacer_holder() {
      bottom_thick=1;
@@ -335,9 +301,6 @@ module assembly(poke_array=[]) {
      translate([0,0,coil_height/2]) {
 	  { yoke_spacer(); yoke_spacer_screw(); }
 	  rotate([0,0,180]) { yoke_spacer(); yoke_spacer_screw(); }
-	  // The axles, exposed when spacer removed.
-	  //translate([-yoke_width/4, -fulcrum_distance, mag_w/2]) rotate([0, 90, 0]) cylinder(r=2/2, h=yoke_width/2);
-	  //translate([-yoke_width/4, +fulcrum_distance, mag_w/2]) rotate([0, 90, 0]) cylinder(r=2/2, h=yoke_width/2);
      }
      magnet_assembly();
      fulcrum_axles();
@@ -354,15 +317,18 @@ module mount_screw(h=17) {
 // Pixels that are currently up.
 poke_array = [for (i = [0:23]) true];
 
-d = 3;
+d = 4;
 if (d == 0) {
      coil_stack();
 } else if (d == 1) {
      yoke(with_magnet=true);
 } else if (d == 2) {
-     coil_stack();
+     coil_stack(poke_array);
      magnet_assembly();
      flex_wiring();
+} else if (d == 3) {
+     translate([0,0,coil_height/2]) {
+	  yoke_spacer(); /*yoke_spacer_screw(); */}
 } else {
      assembly(poke_array);
 }

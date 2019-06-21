@@ -1,5 +1,5 @@
 %!PS
-%%BoundingBox: 0 0 80 80
+%%BoundingBox: 0 0 90 80
 
 /mm { 25.4 div 72 mul } def
 /in { 72 mul } def
@@ -8,13 +8,14 @@
 /mag_len 1.5 in def
 /mag_w 0.25 in def
 /yoke_thick mag_w def
-/yoke_space 4 mm def
 /driver-board-height 9 mm def
 
 /bottom-corner-radius 1 mm def
 
 /coil-height mag_w 2 mul driver-board-height add def
-/coil-length mag_len 2 div def
+/coil-length { mag_len 2 div       % Half the length of the magnet
+	       mag_w 2 div add  % .. and a bit longer to have more straight wire
+	     } def
 
 % The poking pins are different lengths to better match
 % the curvature of the finger.
@@ -33,7 +34,7 @@
 % We offset the coil a little away from the center.
 /center-offset poke-dist poke-dia sub 2 div def
 
-/fulcrum-dist mag_len yoke_thick add 2 div yoke_space add center-offset sub def
+/fulcrum-dist 28 mm def
 /fulcrum-r 2 mm 2 div def
 /fulcrum-wall 1.2 mm def
 
@@ -69,15 +70,18 @@ x-pos poke-dia poke-space-r add add poke-bot-turn poke-space-r 180 270 arc
 
 coil-length coil-height lineto  % top right
 
-coil-length 2 mm add coil-height
-fulcrum-dist coil-length 2.5 div sub coil-height 2 div fulcrum-r fulcrum-wall add add
-fulcrum-dist coil-height 2 div fulcrum-r fulcrum-wall add add
+/curve-start 2 mm def
+/knee-x fulcrum-dist fulcrum-dist coil-length sub sub def
+/knee-y coil-height 2 div def
+coil-length curve-start add coil-height
+  knee-x knee-y fulcrum-r fulcrum-wall add add
+  fulcrum-dist coil-height 2 div fulcrum-r fulcrum-wall add add
 curveto
 
 fulcrum-dist coil-height 2 div fulcrum-r fulcrum-wall add 90 270 arcn
 
-fulcrum-dist coil-length 2.5 div sub coil-height 2 div fulcrum-r fulcrum-wall add sub
-coil-length 2 mm add 0
+knee-x knee-y fulcrum-r fulcrum-wall add sub
+coil-length curve-start add 0
 coil-length 0 curveto
 
 bottom-corner-radius dup dup 270 180 arcn
