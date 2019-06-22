@@ -1,5 +1,4 @@
 EESchema Schematic File Version 4
-LIBS:blisplay-driver-oc-cache
 EELAYER 29 0
 EELAYER END
 $Descr A4 11693 8268
@@ -595,4 +594,33 @@ Text Label 3250 3200 0    50   ~ 0
 SCK
 Text Label 3250 3100 0    50   ~ 0
 SI
+Text Label 5250 2700 0    50   ~ 0
+Coil_1
+Text Label 5250 2800 0    50   ~ 0
+Coil_2
+Text Label 5250 2900 0    50   ~ 0
+Coil_3
+Text Label 5250 3000 0    50   ~ 0
+Coil_4
+Text Label 5250 3100 0    50   ~ 0
+Coil_5
+Text Label 5250 3200 0    50   ~ 0
+Coil_6
+Text Label 5250 3300 0    50   ~ 0
+Coil_7
+Text Label 5250 3400 0    50   ~ 0
+Coil_8
+Text Label 5250 3500 0    50   ~ 0
+Coil_9
+Text Label 5250 3600 0    50   ~ 0
+Coil_10
+Text Label 5250 3700 0    50   ~ 0
+Coil_11
+Text Label 5250 3800 0    50   ~ 0
+Coil_12
+Wire Wire Line
+	4400 2550 3950 2550
+Wire Wire Line
+	3950 2550 3950 2800
+Connection ~ 4400 2550
 $EndSCHEMATC
