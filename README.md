@@ -78,7 +78,7 @@ for a second prototype will reduce that. Current resolution is about 2mm in a
 finger-tips, but future iterations will hopefully improve that more.
 
 ### History
-What motivated all this ? I have a blind friend for whom I made tactile maps
+What motivated all this? I have a blind friend for whom I made tactile maps
 by gluing thread on paper or transferring graphics using swell-paper
 as well as other means to make graphical things accessible.
 But in particular I wanted to directly provide images from a computer without
